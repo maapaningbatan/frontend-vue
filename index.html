@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico">
+
+    <!-- Tailwind CDN (optional if using compiled output.css) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Your compiled Tailwind CSS -->
+    <link href="./output.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+
+    <title>Vite App</title>
+
+    <!-- Inline styles for background -->
+    <style>
+      html {
+        background-color: oklch(1 0 0);
+      }
+      html.dark {
+        background-color: oklch(0.145 0 0);
+      }
+    </style>
+  </head>
+
+  <body class="bg-white dark:bg-black text-gray-900 dark:text-gray-100 font-sans">
+    <div id="app"></div>
+
+    <!-- Dark mode detection -->
+    <script>
+      (function() {
+        const appearance = 'system'; // default to system
+        if (appearance === 'system') {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (prefersDark) {
+            document.documentElement.classList.add('dark');
+          }
+        }
+      })();
+    </script>
+
+    <!-- Vue entry -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

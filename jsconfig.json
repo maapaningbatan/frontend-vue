@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": { "@/*": ["src/*"] },
+    "strict": true,
+    "jsx": "preserve",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "types": ["vite/client", "vue"],      // add 'vue' to recognize Vue types
+    "target": "ES2015",
+    "lib": ["ES2015", "DOM"],
+    "moduleResolution": "node"           // add this to fix module resolution errors
+  },
+  "include": ["src", "src/**/*"],
+  "exclude": ["src/views/HomeView.vue", "node_modules"]
+}
