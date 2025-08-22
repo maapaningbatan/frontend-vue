@@ -52,7 +52,7 @@
             </label>
             <div class="relative">
               <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-              <input v-model="form.login" id="login" type="text" required autofocus
+              <Input v-model="form.login" id="login" type="text" required autofocus
                 class="w-full pl-10 pr-4 py-2.5 text-sm font-medium text-gray-900 placeholder-gray-400 bg-gray-50 border border-gray-300 rounded-xl"
                 placeholder="Enter email or username" />
             </div>
@@ -65,7 +65,7 @@
             </label>
             <div class="relative">
               <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-              <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="password" required
+              <Input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="password" required
                 class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
                 placeholder="Enter your password" />
               <i @click="togglePassword" :class="[showPassword ? 'fa-eye' : 'fa-eye-slash']"
@@ -83,7 +83,7 @@
                 class="bg-white border border-cyan-600 text-lg font-semibold tracking-widest px-5 py-2 rounded-lg text-gray-700 text-center select-none">
                 {{ generatedCaptcha }}
               </div>
-              <input v-model="form.captcha" id="captcha" type="text" required
+              <Input v-model="form.captcha" id="captcha" type="text" required
                 class="flex-1 py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-600 text-sm"
                 placeholder="Enter captcha here" />
             </div>
@@ -131,6 +131,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import Input from "@/components/ui/input/Input.vue";
 
 
 const router = useRouter()
