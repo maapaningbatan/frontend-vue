@@ -1,444 +1,492 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-100 p-6">
-    <div class="flex w-full max-w-6xl bg-white shadow-2xl rounded-3xl overflow-hidden">  
-      <!-- LEFT SIDE (IMAGE) -->
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-100 p-6"
+  >
+    <div class="flex w-full max-w-6xl bg-white shadow-2xl rounded-3xl overflow-hidden">
+      <!-- LEFT SIDE (IMAGE, hidden on small) -->
       <div class="hidden lg:flex w-1/2 items-center justify-center bg-blue-100">
-       <img src="/images/Image2.png" alt="Illustration" class="w-3/4"/>
+        <img src="/images/Image2.png" alt="Illustration" class="w-3/4" />
       </div>
 
-<!-- Right: Register Form -->
+      <!-- RIGHT SIDE (Form) -->
       <div class="flex flex-col w-full lg:w-1/2 p-8">
-
-  <!-- Logo + Title -->
-  <div class="flex items-center space-x-4 mb-6">
-    <img src="/images/logo.png" alt="Logo" class="w-12 sm:w-14 h-auto" />
-    <div>
-      <h1 class="text-xl sm:text-2xl font-bold text-cyan-800">
-        PREMIS <span class="text-sm font-normal text-gray-500">Version.2</span>
-      </h1>
-    </div>
-  </div>
-   <!-- Welcome -->
-        <h2 class="text-2xl text-center sm:text-3xl font-bold text-gray-900 mb-8">
-          Create Your Account
-        </h2>
-
-        
-        <!-- ✅ Your existing form goes here -->
-        <form @submit.prevent="register" enctype="multipart/form-data" class="space-y-8">
-            <!-- User Credentials -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">User Credentials</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Username <span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <User
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.username"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Enter your Username"
-                />
-                <p v-if="errors.username" class="text-red-500 text-sm mt-1">
-                  {{ errors.username }}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Email<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <Mail
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.email_address"
-                  type="email"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Enter your Email"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Password<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <Lock
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.password"
-                  type="password"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Enter your Password"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Confirm Password<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <Lock
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.password_confirmation"
-                  type="password"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Confirm your Password"
-                />
-              </div>
-            </div>
+        <!-- Logo + Title -->
+        <div class="flex items-center space-x-4 mb-6">
+          <img src="/images/logo.png" alt="Logo" class="w-12 sm:w-14 h-auto" />
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-cyan-800">
+              PREMIS <span class="text-sm font-normal text-gray-500">Version.2</span>
+            </h1>
           </div>
         </div>
 
-        <!-- Personal Information -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">
-            Personal Information
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium mb-1">Honorifics</label>
-              <div class="relative">
-                <UserStar
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.honorifics"
-                  type="text"
-                  placeholder="Mr./Ms./Atty./Dir."
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >First Name<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <FolderPen
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.first_name"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="First Name"
-                />
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-1">Middle Name</label>
-              <div class="relative">
-                <FolderPen
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.middle_name"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Middle Name"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Last Name<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <FolderPen
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.last_name"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Last Name"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1">Suffix</label>
-              <div class="relative">
-                <FolderPen
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.suffix"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Jr./Sr."
-                />
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-1">Title</label>
-              <div class="relative">
-                <FolderPen
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.title"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Title"
-                />
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Sex<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <VenusAndMars
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Select
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  v-model="form.sex"
-                  :options="[
-                    { value: 0, label: 'Male' },
-                    { value: 1, label: 'Female' },
-                  ]"
-                  placeholder="Select Sex"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Contact Number<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <Phone
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Input
-                  v-model="form.contact_number"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Contact Number"
-                />
-              </div>
-            </div>
-
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium mb-1"
-                >Address<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <MapPinHouse
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-<Input
-                  v-model="form.address"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Address"
-                />              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Employee Details -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">Employee Details</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Employee ID<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <FolderPen
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-<Input
-                  v-model="form.employee_id"
-                  type="text"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  placeholder="Employee ID"
-                />              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Position<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <BriefcaseBusiness
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Select
-                  v-model="form.position"
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  :options="
-                    positions.map((pos) => ({ value: pos.Position_Id, label: pos.Position }))
-                  "
-                  placeholder="Select Position"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Region<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <Globe
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Select
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  v-model="form.region"
-                  :options="regions.map((r) => ({ value: r.Region_Id, label: r.Region }))"
-                  placeholder="Select Region"
-                />
-              </div>
-            </div>
-
-            <!-- Office -->
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Office<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <Building2
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Select
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  v-model="form.office"
-                  :options="offices.map((o) => ({ value: o.Office_Id, label: o.Office_Desc }))"
-                  placeholder="Select Office"
-                  :disabled="!form.region"
-                />
-              </div>
-            </div>
-
-            <!-- Division -->
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Division<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <Building
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Select
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  v-model="form.division"
-                  :options="
-                    divisions.map((d) => ({ value: d.Division_Id, label: d.Division_Desc }))
-                  "
-                  placeholder="Select Division"
-                  :disabled="!form.office"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Cluster<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <IdCardLanyard
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Select
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  v-model="form.cluster"
-                  :options="clusters.map((c) => ({ value: c.Cluster_Id, label: c.Cluster_Desc }))"
-                  placeholder="Select Cluster"
-                />
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >SOA<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <UserCog
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-               <Select
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  v-model="form.soa"
-                  :options="soas.map((s) => ({ value: s.SOA_Id, label: s.Status_of_Appointment }))"
-                  placeholder="Select SOA"
-                />
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >User Level<span class="text-red-500">*</span></label
-              >
-              <div class="relative">
-                <UserLock
-                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                />
-                <Select
-                  class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                  v-model="form.user_level"
-                  :options="user_levels.map((u) => ({ value: u.Userlevel_Id, label: u.Userlevel }))"
-                  placeholder="Select User Level"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- File Upload -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">Upload</h3>
-          <label class="block text-sm font-medium mb-1"
-            >Upload Contract<span class="text-red-500">*</span></label
-          >
-           <div class="relative flex items-center">
-            <!-- 🔹 Icon -->
-            <Upload class="absolute left-3 text-gray-400 w-5 h-5 pointer-events-none" />
-          <input type="file" @change="handleFileUpload" class="file-input w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm cursor-pointer"
- />
-        </div>
-        </div>
-        <!-- Submit -->
-        <div>
+        <!-- Stepper -->
+        <div class="flex border-b mb-6">
           <button
-            type="submit"
-            class="w-full bg-sky-500 text-white font-semibold py-3 px-6 rounded-lg shadow hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-300"
+            v-for="(step, index) in steps"
+            :key="index"
+            @click="currentStep = index"
+            class="flex-1 py-2 text-center font-medium transition"
+            :class="
+              currentStep === index
+                ? 'border-b-4 border-sky-500 text-sky-600'
+                : 'text-gray-500 hover:text-sky-500'
+            "
           >
-            Register
+            {{ step }}
           </button>
         </div>
-        <p class="text-sm text-gray-600 text-center mt-6">
-          Already have an account?
-          <a href="/login" class="text-cyan-600 font-semibold hover:underline">Login</a>
-        </p>
-        <p v-if="errorMessage" class="text-red-600">{{ errorMessage }}</p>
-      </form>
+
+        <!-- Form -->
+        <form @submit.prevent="register" class="flex flex-col flex-1 min-h-[600px]">
+          <!-- Step 1: User Credentials -->
+          <div v-if="currentStep === 0" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Username -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  Username <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <User
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.username"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Enter your Username"
+                  />
+                  <p v-if="errors?.username" class="text-red-500 text-sm mt-1">
+                    {{ errors.username }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  Email <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <Mail
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.email_address"
+                    type="email"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Enter your Email"
+                  />
+                </div>
+              </div>
+
+              <!-- Password -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  Password <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <Lock
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.password"
+                    type="password"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Enter your Password"
+                  />
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  Confirm Password <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <Lock
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.password_confirmation"
+                    type="password"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Confirm your Password"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Personal Information -->
+          <div v-if="currentStep === 1" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Honorifics -->
+              <div>
+                <label class="block text-sm font-medium mb-1">Honorifics</label>
+                <div class="relative">
+                  <UserStar
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.honorifics"
+                    type="text"
+                    placeholder="Mr./Ms./Atty./Dir."
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                  />
+                </div>
+              </div>
+
+              <!-- First Name -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  First Name <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <FolderPen
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.first_name"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="First Name"
+                  />
+                </div>
+              </div>
+
+              <!-- Middle Name -->
+              <div>
+                <label class="block text-sm font-medium mb-1">Middle Name</label>
+                <div class="relative">
+                  <FolderPen
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.middle_name"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Middle Name"
+                  />
+                </div>
+              </div>
+
+              <!-- Last Name -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  Last Name <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <FolderPen
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.last_name"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Last Name"
+                  />
+                </div>
+              </div>
+
+              <!-- Suffix -->
+              <div>
+                <label class="block text-sm font-medium mb-1">Suffix</label>
+                <div class="relative">
+                  <FolderPen
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.suffix"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Jr./Sr."
+                  />
+                </div>
+              </div>
+
+              <!-- Title -->
+              <div>
+                <label class="block text-sm font-medium mb-1">Title</label>
+                <div class="relative">
+                  <FolderPen
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.title"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Title"
+                  />
+                </div>
+              </div>
+
+              <!-- Sex -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  Sex <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <VenusAndMars
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Select
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    v-model="form.sex"
+                    :options="[
+                      { value: 0, label: 'Male' },
+                      { value: 1, label: 'Female' },
+                    ]"
+                    placeholder="Select Sex"
+                  />
+                </div>
+              </div>
+
+              <!-- Contact Number -->
+              <div>
+                <label class="block text-sm font-medium mb-1">
+                  Contact Number <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <Phone
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.contact_number"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Contact Number"
+                  />
+                </div>
+              </div>
+
+              <!-- Address -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-1">
+                  Address <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <MapPinHouse
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.address"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Address"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Employee Details -->
+          <div v-if="currentStep === 2" class="p-6">
+            <div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <label class="block text-sm font-medium mb-1"
+                  >Employee ID<span class="text-red-500">*</span></label
+                >
+                <div class="relative">
+                  <FolderPen
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                  />
+                  <Input
+                    v-model="form.employee_id"
+                    type="text"
+                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                    placeholder="Employee ID"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1"
+                    >Position<span class="text-red-500">*</span></label
+                  >
+                  <div class="relative">
+                    <BriefcaseBusiness
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                    />
+                    <Select
+                      v-model="form.position"
+                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                      :options="
+                        positions.map((pos) => ({ value: pos.Position_Id, label: pos.Position }))
+                      "
+                      placeholder="Select Position"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1"
+                    >Region<span class="text-red-500">*</span></label
+                  >
+                  <div class="relative">
+                    <Globe
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                    />
+                    <Select
+                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                      v-model="form.region"
+                      :options="regions.map((r) => ({ value: r.Region_Id, label: r.Region }))"
+                      placeholder="Select Region"
+                    />
+                  </div>
+                </div>
+
+                <!-- Office -->
+                <div>
+                  <label class="block text-sm font-medium mb-1"
+                    >Office<span class="text-red-500">*</span></label
+                  >
+                  <div class="relative">
+                    <Building2
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                    />
+                    <Select
+                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                      v-model="form.office"
+                      :options="offices.map((o) => ({ value: o.Office_Id, label: o.Office_Desc }))"
+                      placeholder="Select Office"
+                      :disabled="!form.region"
+                    />
+                  </div>
+                </div>
+
+                <!-- Division -->
+                <div>
+                  <label class="block text-sm font-medium mb-1"
+                    >Division<span class="text-red-500">*</span></label
+                  >
+                  <div class="relative">
+                    <Building
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                    />
+                    <Select
+                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                      v-model="form.division"
+                      :options="
+                        divisions.map((d) => ({ value: d.Division_Id, label: d.Division_Desc }))
+                      "
+                      placeholder="Select Division"
+                      :disabled="!form.office"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-1"
+                    >Cluster<span class="text-red-500">*</span></label
+                  >
+                  <div class="relative">
+                    <IdCardLanyard
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                    />
+                    <Select
+                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                      v-model="form.cluster"
+                      :options="
+                        clusters.map((c) => ({ value: c.Cluster_Id, label: c.Cluster_Desc }))
+                      "
+                      placeholder="Select Cluster"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1"
+                    >SOA<span class="text-red-500">*</span></label
+                  >
+                  <div class="relative">
+                    <UserCog
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                    />
+                    <Select
+                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                      v-model="form.soa"
+                      :options="
+                        soas.map((s) => ({ value: s.SOA_Id, label: s.Status_of_Appointment }))
+                      "
+                      placeholder="Select SOA"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1"
+                    >User Level<span class="text-red-500">*</span></label
+                  >
+                  <div class="relative">
+                    <UserLock
+                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+                    />
+                    <Select
+                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
+                      v-model="form.user_level"
+                      :options="
+                        user_levels.map((u) => ({ value: u.Userlevel_Id, label: u.Userlevel }))
+                      "
+                      placeholder="Select User Level"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Upload -->
+          <div v-if="currentStep === 3" class="space-y-4">
+            <label class="block text-sm font-medium mb-1"
+              >Upload Contract<span class="text-red-500">*</span></label
+            >
+            <div class="relative flex items-center">
+              <!-- 🔹 Icon -->
+              <Upload class="absolute left-3 text-gray-400 w-5 h-5 pointer-events-none" />
+              <input
+                type="file"
+                @change="handleFileUpload"
+                class="file-input w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm cursor-pointer"
+              />
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="flex justify-between mt-8">
+            <button
+              v-if="currentStep > 0"
+              type="button"
+              @click="prevStep"
+              class="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              Back
+            </button>
+
+            <button
+              v-if="currentStep < steps.length - 1"
+              type="button"
+              @click="nextStep"
+              class="ml-auto px-6 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-700 transition-all duration-500"
+            >
+              Next
+            </button>
+
+            <button
+              v-else
+              type="submit"
+              class="ml-auto px-6 py-2 rounded-xl bg-green-600 text-black hover:bg-green-700"
+            >
+              Register
+            </button>
+          </div>
+          <p class="text-sm text-gray-600 text-center mt-6">
+            Already have an account?
+          <router-link to="/auth/login" class="text-cyan-600 font-semibold hover:underline" >Go to Login</router-link>
+          </p>
+        </form>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
-
 <script setup>
-const errors = reactive({})
-
 function validateForm() {
   // reset errors
   Object.keys(errors).forEach((k) => delete errors[k])
@@ -484,6 +532,10 @@ import {
   UserLock,
 } from 'lucide-vue-next'
 
+const steps = ['User Credentials', 'Personal Info', 'Employee Details', 'Upload']
+const currentStep = ref(0)
+
+const emit = defineEmits(['update-success', 'toggle'])
 const router = useRouter()
 
 // Dropdown data
@@ -521,7 +573,16 @@ const form = reactive({
   upload_contract: null,
 })
 
+const nextStep = () => {
+  if (currentStep.value < steps.length - 1) currentStep.value++
+}
+
+const prevStep = () => {
+  if (currentStep.value > 0) currentStep.value--
+}
+
 const successMessage = ref('')
+const errors = reactive({})
 const errorMessage = ref('')
 
 // Fetch initial dropdowns
@@ -612,19 +673,34 @@ async function register() {
         formData.append(key, form[key])
       }
     })
+
     const res = await axios.post('http://localhost:8000/api/register', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
 
-    successMessage.value = 'Please contact Administrator for Activation of Account'
+    if (res.status === 201 || res.status === 200) {
+      successMessage.value =
+        "Register Successfully! Please contact Administrator for Activation of Account"
 
-    // Save message temporarily before redirect
-    localStorage.setItem('registerSuccess', successMessage.value)
+      // save success message so Auth.vue can show it
+      localStorage.setItem("registerSuccess", successMessage.value)
 
-    // Redirect immediately (no delay)
-    router.push('/login')
+      // redirect to /auth (default to Login view)
+      setTimeout(() => {
+        router.push({ path: "/auth", query: { view: "login" } })
+      }, 500)
+    }
   } catch (error) {
-    errorMessage.value = error.response?.data?.message || 'Registration failed'
+    console.error(error)
+    errorMessage.value = error.response?.data?.message || "Registration failed"
   }
 }
+
+
 </script>
+
+<style scoped>
+.input {
+  @apply w-full rounded-xl border border-gray-300 px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none;
+}
+</style>

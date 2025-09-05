@@ -5,13 +5,13 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-import type { BreadcrumbItem as BreadcrumbItemType } from '@/types/api.js'
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
+import type { BreadcrumbItem as BreadcrumbItemType } from '@/types/api';
 
 defineProps<{
-  breadcrumbs: BreadcrumbItemType[]
-}>()
+  breadcrumbs: BreadcrumbItemType[];
+}>();
 </script>
 
 <template>

@@ -1,0 +1,90 @@
+<!-- src/views/Library/Position/PositionCreate.vue -->
+<script setup lang="ts">
+import { ref } from 'vue'
+import Input from '@/components/ui/Input.vue';
+import { type Position, createPosition } from '@/services/positionService'
+
+// emits
+const emit = defineEmits<{
+  (e: 'close'): void
+  (e: 'created'): void
+}>()
+
+// form state
+const createForm = ref<Omit<Position, 'Position_Id'>>({
+  Position: '',
+  Position_Desc: ''
+})
+
+// loading & messages
+const loading = ref(false)
+const errorMsg = ref<string | null>(null)
+const successMsg = ref<string | null>(null)
+
+// functions
+const closeModal = () => emit('close')
+
+const submitForm = async () => {
+  loading.value = true
+  errorMsg.value = null
+  successMsg.value = null
+  try {
+    await createPosition(createForm.value)
+    successMsg.value = 'Position created successfully.'
+    emit('created') // refresh table in parent
+    closeModal()
+  } catch (e: any) {
+    errorMsg.value = e?.response?.data?.message || 'Failed to create position.'
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<template>
+  <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+    <div class="bg-white rounded-lg p-6 w-96 relative">
+      <h2 class="text-lg font-semibold mb-4">Create Position</h2>
+
+      <div class="flex flex-col gap-3">
+        <div>
+          <label class="block text-sm font-medium mb-1">Position</label>
+          <Input
+            v-model="createForm.Position"
+            type="text"
+            class="w-full border rounded px-3 py-2"
+            placeholder="Enter position name"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Description</label>
+          <Input
+            v-model="createForm.Position_Desc"
+            class="w-full border rounded px-3 py-2"
+            placeholder="Enter description"
+          />
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+          <button
+            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            @click="closeModal"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            @click="submitForm"
+            :disabled="loading"
+          >
+            {{ loading ? 'Saving...' : 'Save' }}
+          </button>
+        </div>
+
+        <p v-if="errorMsg" class="text-red-600 text-sm mt-2">{{ errorMsg }}</p>
+        <p v-if="successMsg" class="text-green-600 text-sm mt-2">{{ successMsg }}</p>
+      </div>
+    </div>
+  </div>
+</template>

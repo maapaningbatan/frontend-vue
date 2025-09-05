@@ -24,17 +24,15 @@ export interface BreadcrumbItem {
 }
 
 // Navigation item (optional icon for frontend display)
+
 export interface NavItem {
   title: string;
-  href?: string;
+  href?: string; // now optional
   icon?: LucideIcon;
   isActive?: boolean;
-  children?: NavItem[];   // recursive sub-menu
-  items?: {               // simple link-only sub-menu
-    title: string;
-    url: string;
-  }[];
+  items?: NavItem[];
 }
+
 
 
 // Generic API response wrapper

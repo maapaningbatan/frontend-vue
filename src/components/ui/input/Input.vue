@@ -6,7 +6,7 @@
       cn(
         'w-full h-11 rounded-xl border border-gray-300 bg-gray-50 px-4 text-base text-gray-700 shadow-sm outline-none transition-all duration-200 ease-in-out',
         // Focus & hover effects
-        'focus:border-blue-500 focus:ring-2 focus:ring-blue-400 focus:ring-offset-0 hover:border-blue-400',
+        'focus:border-blue-500 focus:ring-1 focus:ring-blue-400 focus:ring-offset-0 hover:border-blue-400',
         // Placeholder
         'placeholder:text-gray-400',
         // Disabled state

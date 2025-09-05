@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { cn } from "@/lib/utils";
 
 const props = defineProps({
-  class: { type: null, required: false },
+  class: { type: [String, Array, Object], required: false },
 });
 </script>
 

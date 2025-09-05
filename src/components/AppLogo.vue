@@ -15,24 +15,3 @@ import AppLogoIcon from '@/components/AppLogoIcon.vue';
         </span>
     </div>
 </template>
-<style scoped>
-.version-label {
-  display: inline-block;
-  /* Fully visible from the start */
-  opacity: 1;
-  /* Smooth floating motion */
-  animation: floatSmooth 3s ease-in-out infinite alternate;
-}
-
-@keyframes floatSmooth {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-3px) scale(1.02);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-  }
-}
-</style>
