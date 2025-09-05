@@ -1,129 +1,104 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
-import DatePicker from '@/components/ui/datepicker/DatePicker.vue'
+import { reactive, toRefs, watch } from 'vue'
 import Input from '@/components/ui/input/Input.vue'
+import DatePicker from '@/components/ui/datepicker/DatePicker.vue'
 import { Label } from 'reka-ui'
 
-// -----------------------------
 // Props & Emits
-// -----------------------------
-const props = defineProps<{
-  deliveryData: Record<string, any>
-}>()
+const props = defineProps<{ deliveryData: Record<string, any> }>()
 const emit = defineEmits(['update:deliveryData'])
 
-// -----------------------------
 // Reactive local copy
-// -----------------------------
-const localData = reactive({ ...props.deliveryData })
+const local = reactive({ ...props.deliveryData })
 
-// Sync prop changes to localData
 watch(
   () => props.deliveryData,
-  (newData) => {
-    if (newData) {
-      Object.keys(localData).forEach((key) => delete localData[key])
-      Object.assign(localData, newData)
-    }
+  (newVal) => {
+    if (newVal) Object.assign(local, newVal)
   },
-  { deep: true, immediate: true }
+  { immediate: true }
 )
 
-// Emit changes whenever localData changes
-watch(
-  localData,
-  (val) => emit('update:deliveryData', val),
-  { deep: true }
-)
+// Emit updates
+function emitUpdate() {
+  emit('update:deliveryData', { ...local })
+}
+
+const { invoice_no, invoice_total_amount, po_amount, po_date, dr_no, dr_date, ris_no, ris_date, ors_no, ors_date, dv_no, dv_date, prepared_by } = toRefs(local)
 </script>
 
 <template>
-  <Transition
-    enter-active-class="transition ease-out duration-300"
-    enter-from-class="opacity-0 translate-y-2"
-    enter-to-class="opacity-100 translate-y-0"
-    leave-active-class="transition ease-in duration-200"
-    leave-from-class="opacity-100 translate-y-0"
-    leave-to-class="opacity-0 translate-y-2"
-  >
-    <div>
-      <h3 class="text-xl font-bold mb-4">Supporting Documents</h3>
+  <div>
+    <h2 class="text-xl font-bold mb-6">Supporting Documents / Supplier Info</h2>
 
-      <!-- Sales Invoice -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div>
-          <Label>Sales Invoice Number <span class="text-red-500">*</span></Label>
-          <Input v-model="localData.invoice_no" placeholder="Enter Sales Invoice Number" class="w-full" />
-        </div>
-        <div>
-          <Label>Sales Invoice Total Amount</Label>
-          <Input type="number" v-model.number="localData.invoice_total_amount" placeholder="Enter Total Amount" class="w-full" />
-        </div>
-        <div>
-          <Label>Purchase Order Date</Label>
-          <DatePicker v-model="localData.po_date" placeholder="Select Purchase Order Date" class="w-full" />
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div>
+        <Label>Sales Invoice Number</Label>
+        <Input v-model="local.invoice_no" @input="emitUpdate" placeholder="Enter Sales Invoice Number" />
       </div>
-
-      <!-- Purchase Order -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>Purchase Order Amount</Label>
-          <Input v-model="localData.po_amount" readonly class="w-full bg-gray-100" />
-        </div>
-        <div>
-          <Label>Purchase Order Date</Label>
-          <DatePicker v-model="localData.po_date" class="w-full" />
-        </div>
+      <div>
+        <Label>Sales Invoice Total Amount</Label>
+        <Input type="number" v-model.number="local.invoice_total_amount" @input="emitUpdate" />
       </div>
-
-      <!-- Delivery Receipt -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>Delivery Receipt Number</Label>
-          <Input v-model="localData.dr_no" placeholder="Enter Delivery Receipt Number" class="w-full" />
-        </div>
-        <div>
-          <Label>Delivery Receipt Date</Label>
-          <DatePicker v-model="localData.dr_date" class="w-full" />
-        </div>
-      </div>
-
-      <!-- RIS -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>RIS Number</Label>
-          <Input v-model="localData.ris_no" placeholder="Enter RIS Number" class="w-full" />
-        </div>
-        <div>
-          <Label>RIS Date</Label>
-          <DatePicker v-model="localData.ris_date" class="w-full" />
-        </div>
-      </div>
-
-      <!-- ORS -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>ORS Number</Label>
-          <Input v-model="localData.ors_no" placeholder="Enter ORS Number" class="w-full" />
-        </div>
-        <div>
-          <Label>ORS Date</Label>
-          <DatePicker v-model="localData.ors_date" class="w-full" />
-        </div>
-      </div>
-
-      <!-- DV -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>Disbursement Voucher Number</Label>
-          <Input v-model="localData.dv_no" placeholder="Enter DV Number" class="w-full" />
-        </div>
-        <div>
-          <Label>Disbursement Voucher Date</Label>
-          <DatePicker v-model="localData.dv_date" class="w-full" />
-        </div>
+      <div>
+        <Label>Purchase Order Amount</Label>
+        <Input type="number" v-model.number="local.po_amount" readonly />
       </div>
     </div>
-  </Transition>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <Label>PO Date</Label>
+        <DatePicker v-model="local.po_date" @update:modelValue="emitUpdate" />
+      </div>
+      <div>
+        <Label>Delivery Receipt Number</Label>
+        <Input v-model="local.dr_no" @input="emitUpdate" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <Label>Delivery Receipt Date</Label>
+        <DatePicker v-model="local.dr_date" @update:modelValue="emitUpdate" />
+      </div>
+      <div>
+        <Label>RIS Number</Label>
+        <Input v-model="local.ris_no" @input="emitUpdate" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <Label>RIS Date</Label>
+        <DatePicker v-model="local.ris_date" @update:modelValue="emitUpdate" />
+      </div>
+      <div>
+        <Label>ORS Number</Label>
+        <Input v-model="local.ors_no" @input="emitUpdate" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <Label>ORS Date</Label>
+        <DatePicker v-model="local.ors_date" @update:modelValue="emitUpdate" />
+      </div>
+      <div>
+        <Label>DV Number</Label>
+        <Input v-model="local.dv_no" @input="emitUpdate" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <Label>DV Date</Label>
+        <DatePicker v-model="local.dv_date" @update:modelValue="emitUpdate" />
+      </div>
+      <div>
+        <Label>Prepared By</Label>
+        <Input v-model="local.prepared_by" @input="emitUpdate" />
+      </div>
+    </div>
+  </div>
 </template>
