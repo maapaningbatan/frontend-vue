@@ -9,6 +9,7 @@ import DeliveryView from '@/views/Supply/Delivery/DeliveryIndex.vue'
 import DeliveryAdd from '@/views/Supply/Delivery/DeliveryAdd.vue'
 import Auth from '@/views/Auth/Auth.vue'
 import DeliveryEdit from '@/views/Supply/Delivery/DeliveryEdit.vue'
+import UserAccountIndex from '@/views/Library/UserAccount/UserAccountIndex.vue'
 
 const routes = [
   // Default → redirect to /login
@@ -36,6 +37,7 @@ const routes = [
   { path: '/settings', name: 'settings', component: Settings },
   { path: '/library/position', component: PositionView, name: 'Position' },
   { path: '/library/office', component: OfficeView, name: 'Office' },
+  { path: '/library/UserAccount', component: UserAccountIndex, name: 'UserAccount' },
   { path: '/delivery', component: DeliveryView, name: 'Delivery' },
   { path: '/delivery/add', component: DeliveryAdd, name: 'DeliveryAdd' },
   {

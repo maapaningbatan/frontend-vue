@@ -65,9 +65,9 @@ const mainNavItems: NavItem[] = [
     href: '#',
     icon: Folder,
     items: [
+      { title: 'Accounts', href: '/library/UserAccount' },
       { title: 'Position', href: '/library/position' },
       { title: 'Office', href: '/library/office' },
-      { title: 'User Account', href: '/library/user-account' }
     ]
   },
    {
