@@ -6,7 +6,7 @@ import Paginator from 'primevue/paginator'
 import { Search } from 'lucide-vue-next'
 import Input from '@/components/ui/Input.vue'
 // import UserCreate from './UserCreate.vue'
-// import UserEdit from './UserEdit.vue'
+import UserAccountEdit from './UserAccountEdit.vue'
 // import ConfirmDelete from './ConfirmDelete.vue'
 import axios from 'axios'
 
@@ -215,16 +215,12 @@ const closeDeleteModal = () => (isDeleteModalOpen.value = false)
       </div>
 
       <!-- Modals -->
-      <!-- <UserCreate v-if="isCreateModalOpen" @close="closeCreateModal" @created="fetchUsers" />
-      <UserEdit v-if="isEditModalOpen && selectedUser" :user="selectedUser" @close="closeEditModal" @updated="fetchUsers" />
-      <ConfirmDelete
-        v-if="isDeleteModalOpen && selectedUser"
-        :itemName="selectedUser.Username"
-        :itemId="selectedUser.User_Id"
-        deleteApiEndpoint="/api/users"
-        @close="closeDeleteModal"
-        @deleted="fetchUsers"
-      /> -->
+    <UserAccountEdit
+      v-if="isEditModalOpen && selectedUser"
+      :user="selectedUser"
+      @close="closeEditModal"
+      @updated="fetchUsers"
+    />
     </div>
   </AppLayout>
 </template>

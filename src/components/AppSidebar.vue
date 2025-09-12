@@ -4,7 +4,7 @@ import NavMain from '@/components/NavMain.vue'
 import NavUser from '@/components/NavUser.vue'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenuButton } from '@/components/ui/sidebar'
 import type { NavItem } from '@/types/api'
-import { BookOpen, Building2, Folder, LayoutGrid, PackageOpen, MonitorSmartphone , Boxes, NotebookPen, Warehouse, Headset, FileX } from 'lucide-vue-next'
+import { BookOpen, Building2, Folder, LayoutGrid, PackageOpen, MonitorSmartphone, Boxes, NotebookPen, Warehouse, Headset, FileX } from 'lucide-vue-next'
 import AppLogo from './AppLogo.vue'
 import { RouterLink } from 'vue-router'
 
@@ -17,7 +17,10 @@ const mainNavItems: NavItem[] = [
     items: [
       { title: 'Property Record', href: '/library/position' },
       { title: 'ICS Record', href: '/library/office' },
-      { title: 'Acquisition Mode', href: '/library/user-account' }
+      { title: 'Acquisition Mode', href: '/library/user-account' },
+      {title: 'Property Card', href: '/property' },
+      {title: 'Semi-Expandable Card', href: '/semi-expandable' }
+      
     ]
   },
   {
@@ -26,7 +29,7 @@ const mainNavItems: NavItem[] = [
     icon: PackageOpen,
     items: [
       { title: 'Delivery', href: '/delivery' },
-      { title: 'ICS Record', href: '/library/office' },
+      { title: 'Stock Card', href: '/supplies' },
       { title: 'Acquisition Mode', href: '/library/user-account' }
     ]
   },
@@ -40,7 +43,7 @@ const mainNavItems: NavItem[] = [
       { title: 'Acquisition Mode', href: '/library/user-account' }
     ]
   },
-    {
+  {
     title: 'Warehouse',
     href: '#',
     icon: Warehouse,
@@ -67,10 +70,10 @@ const mainNavItems: NavItem[] = [
     items: [
       { title: 'Accounts', href: '/library/UserAccount' },
       { title: 'Position', href: '/library/position' },
-      { title: 'Office', href: '/library/office' },
+      { title: 'Office', href: '/library/office' }, 
     ]
   },
-   {
+  {
     title: 'Report',
     href: '#',
     icon: NotebookPen,
@@ -89,7 +92,7 @@ const mainNavItems: NavItem[] = [
       { title: 'Office', href: '/library/office' },
       { title: 'User Account', href: '/library/user-account' }
     ]
-  },{
+  }, {
     title: 'Archive Data',
     href: '#',
     icon: FileX,

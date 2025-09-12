@@ -6,6 +6,7 @@ import TextArea from '@/components/ui/textarea/TextArea.vue'
 import Input from '@/components/ui/input/Input.vue'
 import { Label } from 'reka-ui'
 
+
 interface Supply {
   SuppliesID: number
   Supplies_Desc: string
@@ -14,6 +15,11 @@ interface Supply {
   CategoryID: number
   isActive: number
   UnitValue?: number
+}
+
+interface ItemType {
+  itemtype_id: number
+  itemtype_name: string
 }
 
 interface Unit {
@@ -38,7 +44,7 @@ interface Model {
 }
 
 // State
-const item_type = ref<string>('')
+const itemTypes = ref<ItemType[]>([])
 const quantity = ref<number>(0)
 const supplies = ref<Supply[]>([])
 const units = ref<Unit[]>([])
@@ -51,6 +57,7 @@ const selectedUnit = ref<number | undefined>(undefined)
 const selectedCategory = ref<number | undefined>(undefined)
 const selectedBrand = ref<number | undefined>(undefined)
 const selectedModel = ref<number | undefined>(undefined)
+const selectedItemType = ref<number | undefined>(undefined)
 
 const filterStatus = ref<number>(0)
 const unitCost = ref<number>(0)
@@ -76,12 +83,14 @@ const total_amountAmount = computed(() => (unitCost.value || 0) * (quantity.valu
 // Fetch data
 onMounted(async () => {
   try {
-    const [suppliesRes, unitsRes, categoriesRes, brandsRes, modelsRes] = await Promise.all([
+    const [suppliesRes, unitsRes, categoriesRes, brandsRes, modelsRes, itemTypesRes] = await Promise.all([
       axios.get('http://localhost:8000/api/supplies'),
       axios.get('http://localhost:8000/api/units'),
       axios.get('http://localhost:8000/api/categories'),
       axios.get('http://localhost:8000/api/brands'),
-      axios.get('http://localhost:8000/api/models')
+      axios.get('http://localhost:8000/api/models'),
+      axios.get('http://localhost:8000/api/itemtypes') // 👈 fetch item types
+
     ])
 
     supplies.value = Array.isArray(suppliesRes.data)
@@ -98,6 +107,8 @@ onMounted(async () => {
     categories.value = Array.isArray(categoriesRes.data) ? categoriesRes.data : []
     brands.value = Array.isArray(brandsRes.data) ? brandsRes.data : []
     models.value = Array.isArray(modelsRes.data) ? modelsRes.data : []
+    itemTypes.value = Array.isArray(itemTypesRes.data) ? itemTypesRes.data : [] // 👈 set item types
+
   } catch (error) {
     console.error('Error fetching data:', error)
   }
@@ -119,17 +130,32 @@ watch(selectedSupply, (newVal) => {
   }
 })
 
+const errorMessage = ref('') // <-- add this
+
 // Props & emits
 const props = defineProps<{ items: any[] }>()
 const emit = defineEmits(['update:items'])
 
 // Add Item
 function addItem() {
+  if (!selectedSupply.value) {
+    errorMessage.value = 'Please select a supply.'
+    return
+  }
+
+  // Check for duplicates
+  const duplicate = props.items.find(item => item.supply === selectedSupply.value)
+  if (duplicate) {
+    errorMessage.value = `The supply "${duplicate.stock_number}" is already added.`
+    return
+  }
+
   const supply = supplies.value.find(s => s.SuppliesID === selectedSupply.value)
+  const type = itemTypes.value.find(t => t.itemtype_id === selectedItemType.value)
 
   const newItem = {
     supply: selectedSupply.value,
-    item_type: item_type.value,
+    item_type: selectedItemType.value,
     stock_number: supply?.StockNo || '',
     unit: selectedUnit.value,
     category: selectedCategory.value,
@@ -139,14 +165,14 @@ function addItem() {
     remarks: remarks.value,
     quantity: quantity.value,
     unit_value: unitCost.value,
-    total_amount: total_amountAmount.value
+    total_amount: total_amountAmount.value,
+    item_type_name: type ? type.itemtype_name : null
   }
 
-  console.log('🆕 Adding item:', newItem)
   emit('update:items', [...props.items, newItem])
 
   // Reset fields
-  item_type.value = ''
+  selectedItemType.value = undefined
   selectedSupply.value = undefined
   selectedUnit.value = undefined
   selectedCategory.value = undefined
@@ -157,6 +183,7 @@ function addItem() {
   additional_description.value = ''
   remarks.value = ''
   filterStatus.value = 0
+  errorMessage.value = '' // clear error
 }
 </script>
 
@@ -170,24 +197,22 @@ function addItem() {
     leave-to-class="opacity-0 translate-y-2"
   >
     <div>
+      <div v-if="errorMessage" class="mb-2 text-red-600 font-medium">
+  {{ errorMessage }}
+</div>
       <h3 class="text-xl font-bold mb-4">Items Details</h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <!-- Item Type -->
-        <div>
-          <Label class="block text-sm font-medium text-gray-700">Item Type</Label>
-          <SelectSearch
-            v-model="item_type"
-            :options="[
-              { label: 'PPE', value: 'PPE' },
-              { label: 'Semi-expandable', value: 'Semi-expandable' },
-              { label: 'Supplies (Consumable)', value: 'Supplies (Consumable)' },
-              { label: 'Semi-expandable Supplies (Non-Consumable)', value: 'Semi-expandable Supplies (Non-Consumable)' }
-            ]"
-            placeholder="Select Item Type"
-            class="mt-1 w-full h-11"
-          />
-        </div>
+<div>
+  <Label class="block text-sm font-medium text-gray-700">Item Type</Label>
+  <SelectSearch
+    v-model="selectedItemType"
+    :options="itemTypes.map(it => ({ label: it.itemtype_name, value: it.itemtype_id }))"
+    placeholder="Select Item Type"
+    class="mt-1 w-full h-11"
+  />
+</div>
 
         <!-- Supplies Section -->
 <div>
@@ -206,7 +231,7 @@ function addItem() {
   <!-- Supplies Dropdown -->
   <SelectSearch
     v-model="selectedSupply"
-    :options="filteredSupplies.map(s => ({ label: s.Supplies_Desc, value: s.SuppliesID }))"
+    :options="filteredSupplies.map(s => ({ label: `${s.Supplies_Desc} / ${s.StockNo}`, value: s.SuppliesID }))"
     placeholder="Select Supply"
     class="w-full h-11"
   />

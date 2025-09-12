@@ -13,6 +13,7 @@ import axios from 'axios'
 // ROUTER
 const router = useRouter()
 const route = useRoute()
+const itemTypes = ref<any[]>([])
 
 // Get route param as number
 const routeId = Number(route.params.id)
@@ -93,18 +94,21 @@ onMounted(async () => {
     items.value = res.data.items ?? []
 
     // 2. Fetch dropdown data
-    const [suppliesRes, unitsRes, categoriesRes, brandsRes, modelsRes] = await Promise.all([
-      axios.get('http://localhost:8000/api/supplies'),
-      axios.get('http://localhost:8000/api/units'),
-      axios.get('http://localhost:8000/api/categories'),
-      axios.get('http://localhost:8000/api/brands'),
-      axios.get('http://localhost:8000/api/models')
-    ])
-    supplies.value = suppliesRes.data
-    units.value = unitsRes.data
-    categories.value = categoriesRes.data
-    brands.value = brandsRes.data
-    models.value = modelsRes.data
+const [suppliesRes, unitsRes, categoriesRes, brandsRes, modelsRes, itemTypesRes] = await Promise.all([
+  axios.get('http://localhost:8000/api/supplies'),
+  axios.get('http://localhost:8000/api/units'),
+  axios.get('http://localhost:8000/api/categories'),
+  axios.get('http://localhost:8000/api/brands'),
+  axios.get('http://localhost:8000/api/models'),
+  axios.get('http://localhost:8000/api/itemtypes')  // 👈 add this
+])
+
+supplies.value = suppliesRes.data
+units.value = unitsRes.data
+categories.value = categoriesRes.data
+brands.value = brandsRes.data
+models.value = modelsRes.data
+itemTypes.value = itemTypesRes.data 
   } catch (error) {
     console.error('Failed to fetch delivery or dropdown data:', error)
     alert('Failed to load delivery details.')
@@ -244,13 +248,20 @@ function goToDeliveryList() {
     <div class="relative min-h-[200px]">
       <keep-alive>
         <div v-for="(step, index) in steps" :key="index">
-          <component
-            :is="step.component"
-            v-show="activeStep === index + 1"
-            v-model:items="items"
-            v-model:delivery-data="deliveryData"
-            v-bind="activeStep === 2 ? { supplies, units, categories, brands, models } : {}"
-          />
+<component 
+  :is="step.component"
+  v-show="activeStep === index + 1"
+  v-model:items="items"
+  v-model:delivery-data="deliveryData"
+  v-bind="index + 1 === 2 || index + 1 === 3 ? {
+    supplies,
+    units,
+    categories,
+    brands,
+    models,
+    itemTypes
+  } : {}"
+/>
         </div>
       </keep-alive>
     </div>

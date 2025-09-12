@@ -6,6 +6,12 @@ interface Supply {
   SuppliesID: number
   Supplies_Desc: string
 }
+
+interface ItemType {
+  itemtype_id: number
+  itemtype_name: string
+}
+
 interface Unit {
   Unit_Id: number
   Unit_Type: string
@@ -32,22 +38,20 @@ const props = defineProps<{
   categories: Category[]
   brands: Brand[]
   models: Model[]
+  itemTypes: ItemType[]
 }>()
 
 const emit = defineEmits(['update:items'])
 
 // Computed property for grand total
 const grandTotal = computed(() => {
-  return props.items
-    .reduce((total, item) => total + item.quantity * item.unit_value, 0)
-    .toFixed(2)
+  return props.items.reduce((total, item) => total + item.quantity * item.unit_value, 0).toFixed(2)
 })
 
 // Sync grand total into deliveryData
 watch(grandTotal, (newVal) => {
   props.deliveryData.po_amount = newVal
 })
-
 
 function removeItem(index: number) {
   if (confirm('Are you sure you want to remove this item?')) {
@@ -59,32 +63,41 @@ function removeItem(index: number) {
 
 // Methods to get names from IDs
 function getSupplyName(id: number) {
-  const s = props.supplies?.find(x => x.SuppliesID === id)
+  const s = props.supplies?.find((x) => x.SuppliesID === id)
   return s ? s.Supplies_Desc : id
 }
 function getUnitName(id: number) {
-  const u = props.units?.find(x => x.Unit_Id === id)
+  const u = props.units?.find((x) => x.Unit_Id === id)
   return u ? u.Unit_Type : id
 }
 function getCategoryName(id: number) {
-  const c = props.categories?.find(x => x.category_id === id)
+  const c = props.categories?.find((x) => x.category_id === id)
   return c ? c.category_desc : id
 }
 function getBrandName(id: number) {
-  const b = props.brands?.find(x => x.Brand_Id === id)
+  const b = props.brands?.find((x) => x.Brand_Id === id)
   return b ? b.Brand_Description : id
 }
 function getModelName(id: number) {
-  const m = props.models?.find(x => x.model_id === id)
+  const m = props.models?.find((x) => x.model_id === id)
   return m ? m.model_desc : id
+}
+
+function getItemTypeName(id: number) {
+  const t = props.itemTypes?.find((x) => x.itemtype_id === id)
+  return t ? t.itemtype_name : id
 }
 </script>
 
-
 <template>
-  <Transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 translate-y-2"
-    enter-to-class="opacity-100 translate-y-0" leave-active-class="transition ease-in duration-200"
-    leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-2">
+  <Transition
+    enter-active-class="transition ease-out duration-300"
+    enter-from-class="opacity-0 translate-y-2"
+    enter-to-class="opacity-100 translate-y-0"
+    leave-active-class="transition ease-in duration-200"
+    leave-from-class="opacity-100 translate-y-0"
+    leave-to-class="opacity-0 translate-y-2"
+  >
     <div>
       <h2 class="text-xl font-bold mb-4">Review Delivery Items</h2>
       <div class="overflow-auto border rounded-lg shadow-sm">
@@ -108,12 +121,16 @@ function getModelName(id: number) {
           <tbody>
             <tr v-for="(item, index) in items" :key="index" class="border-t hover:bg-gray-50">
               <td class="px-3 py-2">
-                <button type="button" class="text-red-600 hover:underline" @click="removeItem(index)">
+                <button
+                  type="button"
+                  class="text-red-600 hover:underline"
+                  @click="removeItem(index)"
+                >
                   Remove
                 </button>
               </td>
               <td>{{ getSupplyName(item.supply) }}</td>
-              <td class="px-3 py-2">{{ item.item_type }}</td>
+<td class="px-3 py-2">{{ getItemTypeName(item.item_type) }}</td>
               <td class="px-3 py-2">{{ item.stock_number }}</td>
               <td class="px-3 py-2">{{ getUnitName(item.unit) }}</td>
               <td class="px-3 py-2">{{ getCategoryName(item.category) }}</td>

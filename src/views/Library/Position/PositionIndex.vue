@@ -7,7 +7,7 @@ import PositionCreate from './PositionCreate.vue'
 import PositionEdit from './PositionEdit.vue'
 import ConfirmDelete from './ConfirmDelete.vue'
 import Paginator from 'primevue/paginator'
-import { Search} from 'lucide-vue-next';
+import { Search } from 'lucide-vue-next';
 import Input from '@/components/ui/Input.vue';
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Positions', href: '/positions' }]
@@ -82,7 +82,7 @@ const closeDeleteModal = () => isDeleteModalOpen.value = false
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex flex-col gap-6 p-6">
 
-    <!-- Header created by boggz -->
+      <!-- Header created by boggz -->
       <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800 text-center sm:text-left">
           List of Positions
@@ -91,7 +91,7 @@ const closeDeleteModal = () => isDeleteModalOpen.value = false
 
       <!-- Bottom actions (t) -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      
+
         <!-- Left: Search + Dropdown -->
         <div class="flex items-center gap-3">
           <div class="relative w-full sm:w-64">
@@ -99,29 +99,19 @@ const closeDeleteModal = () => isDeleteModalOpen.value = false
             <Search class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
 
             <!-- Input -->
-            <Input
-              type="text"
-              v-model="searchTerm"
-              placeholder="Search positions..."
-              class="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <Input type="text" v-model="searchTerm" placeholder="Search positions..."
+              class="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <!-- Rows per page dropdown -->
-          <Paginator
-            v-model:first="first"
-            v-model:rows="rows"
-            :totalRecords="totalRecords"
-            :rowsPerPageOptions="[10, 20, 30 , 40 , 50]"
-            template="RowsPerPageDropdown"
-          />
+          <Paginator v-model:first="first" v-model:rows="rows" :totalRecords="totalRecords"
+            :rowsPerPageOptions="[10, 20, 30, 40, 50]" template="RowsPerPageDropdown" />
         </div>
 
-         <!-- Bottom right Create button -->
+        <!-- Bottom right Create button -->
         <div>
           <button
             class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition duration-200"
-            @click="openCreateModal"
-          >
+            @click="openCreateModal">
             + Create Position
           </button>
         </div>
@@ -148,7 +138,8 @@ const closeDeleteModal = () => isDeleteModalOpen.value = false
             <tr v-for="pos in filteredPositions.slice(first, first + rows)" :key="pos.Position_Id"
               class="hover:bg-blue-50 transition">
               <td class="pl-20 pr-5 text-sm text-gray-700 border-r border-gray-200">{{ pos.Position_Id }}</td>
-              <td class="pl-30 pr-10 itemtext-sm text-gray-800 font-medium border-r border-gray-200">{{ pos.Position }}</td>
+              <td class="pl-30 pr-10 itemtext-sm text-gray-800 font-medium border-r border-gray-200">{{ pos.Position }}
+              </td>
               <td class="px-4 py-3 text-sm text-gray-500 border-r border-gray-200">{{ pos.Position_Desc || '—' }}</td>
               <td class="px-4 py-3 text-center flex justify-center gap-2">
                 <button class="px-3 py-1 bg-green-400 text-white rounded hover:bg-green-600 transition duration-200"

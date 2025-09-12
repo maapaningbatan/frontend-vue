@@ -5,6 +5,7 @@ import { type BreadcrumbItem } from '@/types/api'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import ActionButtons from '@/components/ui/button/ActionButtons.vue'
+import { Check } from 'lucide-vue-next'
 
 // Router instance
 const router = useRouter()
@@ -34,8 +35,8 @@ function formatDate(dateString: string): string {
   const date = new Date(dateString)
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
-    month: 'long', // June
-    day: 'numeric', // 4
+    month: 'long',
+    day: 'numeric',
   })
 }
 
@@ -43,7 +44,7 @@ function formatDate(dateString: string): string {
 async function fetchDeliveries() {
   try {
     const res = await axios.get('http://127.0.0.1:8000/api/delivery')
-    deliveries.value = res.data // adjust if wrapped in { data: [...] }
+    deliveries.value = res.data
   } catch (err: any) {
     console.error(err)
     error.value = 'Failed to load deliveries'
@@ -53,16 +54,32 @@ async function fetchDeliveries() {
 }
 
 onMounted(fetchDeliveries)
+
+// Delete delivery
 async function deleteDelivery(id: number) {
   if (!confirm('Are you sure you want to delete this delivery?')) return
 
   try {
     await axios.delete(`http://localhost:8000/api/delivery/${id}`)
-    // Remove the deleted delivery from the list
     deliveries.value = deliveries.value.filter((d) => d.delivery_id !== id)
   } catch (err) {
     console.error('Failed to delete delivery:', err)
     alert('Failed to delete delivery. Check console for details.')
+  }
+}
+
+// Approve delivery
+async function approveDelivery(id: number) {
+  if (!confirm('Approve this delivery? Once approved, it will be locked.')) return
+
+  try {
+    await axios.post(`http://127.0.0.1:8000/api/delivery/${id}/approve`)
+    // Refresh list
+    await fetchDeliveries()
+    alert('Delivery approved successfully!')
+  } catch (err) {
+    console.error('Failed to approve delivery:', err)
+    alert('Failed to approve delivery. Check console for details.')
   }
 }
 </script>
@@ -91,18 +108,15 @@ async function deleteDelivery(id: number) {
             <tr>
               <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Action</th>
               <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Delivery ID</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                Purchase Order
-              </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Purchase Order</th>
               <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">IAR Number</th>
               <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Purchase Date</th>
               <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Supplier</th>
               <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Amount</th>
               <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Code Number</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">
-                Date Created
-              </th>
+              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Date Created</th>
               <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Prepared By</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Status</th>
             </tr>
           </thead>
 
@@ -112,12 +126,26 @@ async function deleteDelivery(id: number) {
               :key="delivery.delivery_id"
               class="hover:bg-blue-50 transition"
             >
-              <td class="px-4 py-3 text-center flex justify-center gap-2">
-                <ActionButtons
-                  @edit="handleEdit(delivery.delivery_id)"
-                  @delete="deleteDelivery(delivery.delivery_id)"
-                />
-              </td>
+             <td class="px-4 py-3 text-center flex justify-center gap-2">
+  <!-- Existing Action Buttons -->
+  <ActionButtons
+    @edit="handleEdit(delivery.delivery_id)"
+    @delete="deleteDelivery(delivery.delivery_id)"
+  />
+
+  <!-- ✅ New Approve Button -->
+  <button
+    @click="approveDelivery(delivery.delivery_id)"
+    :disabled="delivery.status === 'Approved'"
+    class="p-2 rounded-full border flex items-center justify-center transition
+           hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
+           border-blue-700 text-blue-500 hover:bg-blue-100"
+  >
+    <Check class="w-4 h-4" />
+  </button>
+</td>
+
+
               <td class="px-4 py-3 text-sm text-gray-700">{{ delivery.delivery_id }}</td>
               <td class="px-4 py-3 text-sm font-medium text-gray-800">
                 {{ delivery.purchase_order_number }}
@@ -136,11 +164,21 @@ async function deleteDelivery(id: number) {
               <td class="px-4 py-3 text-sm text-gray-500">
                 {{ delivery.prepared_by_employee?.full_name || 'N/A' }}
               </td>
+              <td class="px-4 py-3 text-sm font-semibold">
+                <span
+                  class="px-2 py-1 rounded text-xs"
+                  :class="delivery.status === 'Approved'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-yellow-100 text-yellow-700'"
+                >
+                  {{ delivery.status }}
+                </span>
+              </td>
             </tr>
 
             <!-- Empty state -->
             <tr v-if="!deliveries.length">
-              <td colspan="10" class="p-6 text-center text-gray-400 italic">
+              <td colspan="11" class="p-6 text-center text-gray-400 italic">
                 No deliveries found.
               </td>
             </tr>

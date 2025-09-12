@@ -89,10 +89,11 @@ const highlightedIndex = ref(0);
 const startIndex = ref(0);
 
 const filteredOptions = computed(() =>
-  props.options.filter((opt) =>
-    opt.label.toLowerCase().includes(search.value.toLowerCase())
+  (props.options || []).filter((opt) =>
+    (opt?.label ?? "").toString().toLowerCase().includes((search.value ?? "").toLowerCase())
   )
 );
+
 
 const visibleOptions = computed(() =>
   filteredOptions.value.slice(startIndex.value, startIndex.value + props.visibleCount)
