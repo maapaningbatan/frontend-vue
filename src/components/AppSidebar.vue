@@ -18,7 +18,8 @@ const mainNavItems: NavItem[] = [
       { title: 'Property Record', href: '/library/position' },
       { title: 'ICS Record', href: '/library/office' },
       { title: 'Acquisition Mode', href: '/library/user-account' },
-      {title: 'Property Card', href: '/property' },
+      {title: 'Property Issuance', href: '/property-issuance' },
+      {title: 'Property Card', href: '/property-card' },
       {title: 'Semi-Expandable Card', href: '/semi-expandable' }
       
     ]
@@ -30,7 +31,7 @@ const mainNavItems: NavItem[] = [
     items: [
       { title: 'Delivery', href: '/delivery' },
       { title: 'Stock Card', href: '/supplies' },
-      { title: 'Acquisition Mode', href: '/library/user-account' }
+{ title: 'RIS', href: '/ris' }
     ]
   },
   {

@@ -55,27 +55,27 @@ onMounted(async () => {
     })
 
     // Fetch logged-in user
-const token = localStorage.getItem('auth_token')
-if (token) {
-  const userRes = await axios.get('http://localhost:8000/api/user-profile', {
-    headers: { Authorization: `Bearer ${token}` },
-    withCredentials: true
-  })
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      const userRes = await axios.get('http://localhost:8000/api/user-profile', {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true
+      })
 
-  console.log('User response:', userRes.data)
+      console.log('User response:', userRes.data)
 
-  user.value = userRes.data
+      user.value = userRes.data
 
-  emit('update:deliveryData', {
-    ...props.deliveryData,
-    prepared_by: user.value?.Employee_PK ?? ''
-  })
-} else {
-  emit('update:deliveryData', {
-    ...props.deliveryData,
-    prepared_by: ''
-  })
-}
+      emit('update:deliveryData', {
+        ...props.deliveryData,
+        prepared_by: user.value?.Employee_PK ?? ''
+      })
+    } else {
+      emit('update:deliveryData', {
+        ...props.deliveryData,
+        prepared_by: ''
+      })
+    }
   } catch (error) {
     console.error('Failed to fetch initial data:', error)
   }

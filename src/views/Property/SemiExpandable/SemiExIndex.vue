@@ -118,29 +118,36 @@ onMounted(() => {
         </div>
 
         <!-- Active/Inactive -->
-        <div class="relative inline-flex bg-gray-200 rounded-full p-1 w-max">
-          <label
-            @click="setFilter('active')"
-            class="relative z-10 cursor-pointer px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center justify-center"
-            :class="activeFilter==='active' ? 'text-white' : 'text-gray-700'"
-          >
-            Active Only
-          </label>
+       <div class="relative inline-flex bg-gray-200 rounded-full p-1 w-max">
+  <!-- Active Only -->
+  <label
+    @click="setFilter('active')"
+    class="relative z-10 cursor-pointer px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center justify-center"
+    :class="activeFilter === 'active' ? 'text-white' : 'text-gray-700'"
+  >
+    Active Only
+  </label>
 
-          <label
-            @click="setFilter('inactive')"
-            class="relative z-10 cursor-pointer px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center justify-center"
-            :class="activeFilter==='inactive' ? 'text-white' : 'text-gray-700'"
-          >
-            Inactive Only
-          </label>
+  <!-- Inactive Only -->
+  <label
+    @click="setFilter('inactive')"
+    class="relative z-10 cursor-pointer px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center justify-center"
+    :class="activeFilter === 'inactive' ? 'text-white' : 'text-gray-700'"
+  >
+    Inactive Only
+  </label>
 
-          <!-- Sliding background -->
-          <span
-            class="absolute top-1 left-1 bg-blue-600 rounded-full w-1/2 h-full transition-transform duration-300"
-            :style="{ transform: activeFilter==='active' ? 'translateX(0%)' : 'translateX(100%)' }"
-          ></span>
-        </div>
+  <!-- Sliding background -->
+  <!-- Sliding background -->
+<span
+  class="absolute top-1 left-1 rounded-full w-1/2 h-full transition duration-300"
+  :style="{
+    transform: activeFilter === 'active' ? 'translateX(0%)' : 'translateX(100%)',
+    backgroundColor: activeFilter === 'active' ? '#2563EB' : '#DC2626' // blue : red
+  }"
+></span>
+
+</div>
       </div>
 
       <!-- Add button -->
@@ -179,7 +186,7 @@ onMounted(() => {
                 @delete="handleDelete(card.supply_id)"
               />
               <button
-                @click="router.push(`/semi-expandable/${card.supply_id}`)"
+                @click="router.push(`semi-expandable/${card.supply_id}`)"
                 class="w-8 h-8 flex items-center justify-center rounded-full border border-blue-500 text-blue-500 hover:bg-blue-100 transition duration-200"
                 title="View Semi-Expandable Card"
               >
@@ -192,7 +199,7 @@ onMounted(() => {
             <td class="px-4 py-3 text-sm text-gray-800">{{ card.supply?.StockNo }}</td>
             <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.category?.category_desc }}</td>
             <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.Supplies_Desc }}</td>
-            <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.UnitID }}</td>
+            <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.unit?.Unit_Type }}</td>
             <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.UnitValue }}</td>
             <td class="px-4 py-3 text-sm text-gray-500">{{ card.latest_balance ?? 0 }}</td>
             <td class="px-4 py-3 text-sm text-gray-500 text-center">{{ card.supply?.Non_Stockpile_Qty ?? 0 }}</td>

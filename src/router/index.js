@@ -15,7 +15,11 @@ import PropertyIndex from '@/views/Property/PropertyCard/PropertyIndex.vue'
 import SemiExIndex from '@/views/Property/SemiExpandable/SemiExIndex.vue'
 import SemiExCard from '@/views/Property/SemiExpandable/SemiExCard.vue'
 import UserAccountIndex from '@/views/Library/UserAccount/UserAccountIndex.vue'
-
+import PropertyCard from '@/views/Property/PropertyCard/PropertyCard.vue'
+import PropertyIssuanceIndex from '@/views/Property/PropertyIssuance/PropertyIssuanceIndex.vue'
+import PropertyIssuanceEdit from '@/views/Property/PropertyIssuance/PropertyIssuanceEdit.vue'
+import RISIndex from '@/views/Supply/RIS/RISIndex.vue'
+import RISAdd from '@/views/Supply/RIS/RISAdd.vue'
 
 
 const routes = [
@@ -56,17 +60,29 @@ const routes = [
     props: true, // <-- allows `id` param to be passed as a prop
   },
 
-   // Stock Card
-   { path: '/supplies', component: SupplyList, name: 'SupplyList' },
-   { path: '/stock/card/:id', name: 'StockCard', component: StockCard, props: true },
+  // Stock Card
+  { path: '/supplies', component: SupplyList, name: 'SupplyList' },
+  { path: '/stock/card/:id', name: 'StockCard', component: StockCard, props: true },
+  { path: '/property-card', component: PropertyIndex, name: 'PropertyIndex' },
+  { path: '/property-card/:id', component: PropertyCard, name: 'PropertyCard' },
+
+  { path: '/semi-expandable', component: SemiExIndex, name: 'SemiExIndex' },
+  { path: '/semi-expandable/:id', component: SemiExCard, name: 'SemiExCard' },
+
+  {path:'/property-issuance',component:PropertyIssuanceIndex,name:'PropertyIssuanceIndex'},
+ { 
+  path:'/property-issuance/:type/:id/edit',
+  component: PropertyIssuanceEdit,
+  name: 'PropertyIssuanceEdit',
+  props: true
+},
+// RIS
+  { path: '/ris', component: RISIndex, name: 'RISIndex' },
+  { path: '/ris/add', component: RISAdd, name: 'RISAdd' },
+
 
   // Catch-all → redirect to login
   { path: '/:pathMatch(.*)*', redirect: '/login' },
-
-  {path: '/property', component: PropertyIndex, name: 'PropertyIndex' },
-
-  { path: '/semi-expandable', component: SemiExIndex, name: 'SemiExIndex' },
-  {path: '/semi-expandable/:id', component: SemiExCard, name: 'SemiExCard' },
 ]
 
 const router = createRouter({
