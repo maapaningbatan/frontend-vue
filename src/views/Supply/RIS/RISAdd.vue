@@ -7,7 +7,6 @@ import AppLayout from '@/components/layouts/AppLayout.vue'
 
 import StepRISDetails from '@/components/steps-ris/Step1RISDetails.vue'
 import StepRISItemsDetails from '@/components/steps-ris/Step2RISItemsDetails.vue'
-import StepRISItems from '@/components/steps-ris/Step3RISItems.vue'
 
 import axios from 'axios'
 
@@ -15,7 +14,7 @@ const router = useRouter()
 
 // Stepper state
 const activeStep = ref(1)
-const totalSteps = 3
+const totalSteps = 2
 
 // RIS Data
 const risData = ref({
@@ -92,7 +91,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 const steps = [
   { title: 'RIS Details', description: 'Request details', icon: ClipboardList, component: StepRISDetails },
   { title: 'RIS Items Details', description: 'Add requested items', icon: PackageIcon, component: StepRISItemsDetails },
-  { title: 'RIS Items', description: 'Review requested items', icon: ScrollText, component: StepRISItems }
 ]
 
 // Navigation actions
@@ -201,17 +199,8 @@ watch(showSuccessModal, (val) => {
               v-show="activeStep === index + 1"
               v-model:items="items"
               v-model:ris-data="risData"
-              v-bind="index + 1 === 2 || index + 1 === 3 ? {
-                supplies,
-                units,
-                categories,
-                brands,
-                models,
-                itemTypes
-              } : {
-                regions,
-                offices
-              }"
+v-bind="index + 1 === 2 ? { supplies, units } : { regions, offices }"
+
             />
           </div>
         </keep-alive>
