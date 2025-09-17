@@ -20,14 +20,19 @@ const totalSteps = 2
 const risData = ref({
   ris_number: '',
   responsibility_center: '',
-  region: '',
+  region: '',       // display
+  region_id: null,  // backend
   office: '',
+  office_id: null,
   fund_cluster: '',
   ris_date: new Date().toISOString().slice(0, 10),
   purpose: '',
-  requested_by: '',
+  requested_by: '',       // display
+  requested_by_id: null,  // backend
   received_by: '',
-  approved_by: ''
+  received_by_id: null,
+  approved_by: '',
+  approved_by_id: null
 })
 
 // Items for Step 2
@@ -36,6 +41,7 @@ const items = ref<any[]>([])
 // Dropdowns
 const regions = ref<any[]>([])
 const offices = ref<any[]>([])
+const employees = ref<any[]>([])
 const supplies = ref<any[]>([])
 const units = ref<any[]>([])
 const itemTypes = ref<any[]>([])
@@ -66,18 +72,39 @@ function goToStep(index: number) {
   activeStep.value = index + 1
 }
 
-// Fetch Step 1 dropdowns
+// --- Fetch logged-in user and dropdowns for Step 1 ---
 onMounted(async () => {
   loading.value = true
   try {
-    const [regionsRes, officesRes] = await Promise.all([
+    const userRes = await axios.get('http://localhost:8000/api/user-profile', { withCredentials: true })
+    const user = userRes.data
+
+    // Pre-fill logged-in user's region, office, requested_by
+    risData.value.region = user.Region_Desc
+    risData.value.region_id = user.Region
+    risData.value.office = user.Office_Desc
+    risData.value.office_id = user.Office
+    risData.value.requested_by = `${user.First_Name} ${user.Last_Name}`
+    risData.value.requested_by_id = user.User_Id
+
+    // Fetch other dropdowns
+    const [regionsRes, officesRes, employeesRes] = await Promise.all([
       axios.get('http://localhost:8000/api/regions'),
-      axios.get('http://localhost:8000/api/offices/region/1') // TODO: replace 1 with auth user’s region
+      axios.get(`http://localhost:8000/api/offices/region/${user.Region}`),
+      axios.get(`http://localhost:8000/api/employees?division_id=${user.Division}`)
     ])
     regions.value = regionsRes.data
     offices.value = officesRes.data
+    employees.value = employeesRes.data
+
+    // Optionally pre-fill received_by / approved_by with current user
+    risData.value.received_by = `${user.First_Name} ${user.Last_Name}`
+    risData.value.received_by_id = user.User_Id
+    risData.value.approved_by = `${user.First_Name} ${user.Last_Name}`
+    risData.value.approved_by_id = user.User_Id
+
   } catch (error) {
-    console.error('Failed to fetch Step 1 dropdowns', error)
+    console.error('Failed to fetch user or dropdown data', error)
   } finally {
     loading.value = false
   }
@@ -111,13 +138,22 @@ const successMessage = ref('')
 async function SubmitRIS() {
   loading.value = true
   try {
+    // Prepare payload with IDs for backend
     const payload = {
-      ...risData.value,
+      responsibility_center: risData.value.responsibility_center,
+      region_id: risData.value.region_id,
+      office_id: risData.value.office_id,
+      fund_cluster: risData.value.fund_cluster,
+      ris_date: risData.value.ris_date,
+      purpose: risData.value.purpose,
+      requested_by_id: risData.value.requested_by_id,
+      received_by_id: risData.value.received_by_id,
+      approved_by_id: risData.value.approved_by_id,
       items: items.value.map(i => ({
         supply_id: i.supply_id,
         unit_id: i.unit_id,
         quantity_requested: i.quantity_requested,
-        quantity_issued: i.quantity_issued ?? null, // can be null
+        quantity_issued: i.quantity_issued ?? null,
         description: i.description,
         remarks: i.remarks
       }))
@@ -127,7 +163,7 @@ async function SubmitRIS() {
 
     const res = await axios.post('http://localhost:8000/api/ris', payload, { withCredentials: true })
 
-    successMessage.value = `✅ RIS submitted successfully! Number: ${res.data.ris_number}`
+    successMessage.value = `✅ RIS submitted successfully! Number: ${res.data.data.ris_number}`
     showSuccessModal.value = true
 
     // Reset form
@@ -136,13 +172,18 @@ async function SubmitRIS() {
       ris_number: '',
       responsibility_center: '',
       region: '',
+      region_id: null,
       office: '',
+      office_id: null,
       fund_cluster: '',
       ris_date: new Date().toISOString().slice(0, 10),
       purpose: '',
       requested_by: '',
+      requested_by_id: null,
       received_by: '',
-      approved_by: ''
+      received_by_id: null,
+      approved_by: '',
+      approved_by_id: null
     }
     items.value = []
 
@@ -172,6 +213,7 @@ watch(showSuccessModal, (val) => {
   if (val) setTimeout(() => { showSuccessModal.value = false }, 3000)
 })
 </script>
+
 
 <template>
   <AppLayout :breadcrumbs="breadcrumbs">
@@ -262,3 +304,4 @@ watch(showSuccessModal, (val) => {
     </div>
   </AppLayout>
 </template>
+
