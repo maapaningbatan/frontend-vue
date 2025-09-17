@@ -2,17 +2,17 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { type BreadcrumbItem } from '@/types/api'
-import { PackageIcon, ScrollText, ClipboardList } from 'lucide-vue-next'
+import { ClipboardList, PackageIcon } from 'lucide-vue-next'
 import AppLayout from '@/components/layouts/AppLayout.vue'
 
 import StepRISDetails from '@/components/steps-ris/Step1RISDetails.vue'
 import StepRISItemsDetails from '@/components/steps-ris/Step2RISItemsDetails.vue'
-
 import axios from 'axios'
 
+// Router
 const router = useRouter()
 
-// Stepper state
+// Stepper
 const activeStep = ref(1)
 const totalSteps = 2
 
@@ -30,55 +30,17 @@ const risData = ref({
   approved_by: ''
 })
 
-// Items shared across steps
+// Items for Step 2
 const items = ref<any[]>([])
 
 // Dropdowns
-const supplies = ref<any[]>([])
-const units = ref<any[]>([])
-const categories = ref<any[]>([])
-const brands = ref<any[]>([])
-const models = ref<any[]>([])
-const itemTypes = ref<any[]>([])
 const regions = ref<any[]>([])
 const offices = ref<any[]>([])
+const supplies = ref<any[]>([])
+const units = ref<any[]>([])
+const itemTypes = ref<any[]>([])
 
-// Fetch dropdown data
-onMounted(async () => {
-  try {
-    const [
-      suppliesRes, unitsRes, categoriesRes, brandsRes, modelsRes,
-      itemTypesRes, regionsRes, officesRes
-    ] = await Promise.all([
-      axios.get('http://localhost:8000/api/supplies'),
-      axios.get('http://localhost:8000/api/units'),
-      axios.get('http://localhost:8000/api/categories'),
-      axios.get('http://localhost:8000/api/brands'),
-      axios.get('http://localhost:8000/api/models'),
-      axios.get('http://localhost:8000/api/itemtypes'),
-      axios.get('http://localhost:8000/api/regions'),
-      axios.get('http://localhost:8000/api/offices/region/1') // replace with auth user's region
-    ])
-    supplies.value = suppliesRes.data
-    units.value = unitsRes.data
-    categories.value = categoriesRes.data
-    brands.value = brandsRes.data
-    models.value = modelsRes.data
-    itemTypes.value = itemTypesRes.data
-    regions.value = regionsRes.data
-    offices.value = officesRes.data
-
-    // Auto-generate RIS number
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const regionCode = regions.value[0]?.Region_Code ?? 'REG'
-    const officeCode = offices.value[0]?.Office_Code ?? 'OFF'
-    risData.value.ris_number = `${year}-${month}-${regionCode}-${officeCode}-0001`
-  } catch (error) {
-    console.error('Failed to fetch dropdown data', error)
-  }
-})
+const loading = ref(false)
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
@@ -87,38 +49,88 @@ const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Add RIS', href: '/ris/add' }
 ]
 
-// Steps
+// Stepper definition
 const steps = [
   { title: 'RIS Details', description: 'Request details', icon: ClipboardList, component: StepRISDetails },
-  { title: 'RIS Items Details', description: 'Add requested items', icon: PackageIcon, component: StepRISItemsDetails },
+  { title: 'RIS Items', description: 'Add requested items', icon: PackageIcon, component: StepRISItemsDetails }
 ]
 
-// Navigation actions
-function nextStep() { if (activeStep.value < totalSteps) activeStep.value++ }
-function prevStep() { if (activeStep.value > 1) activeStep.value-- }
-function goToStep(index: number) { activeStep.value = index + 1 }
+// Navigation
+function nextStep() {
+  if (activeStep.value < totalSteps) activeStep.value++
+}
+function prevStep() {
+  if (activeStep.value > 1) activeStep.value--
+}
+function goToStep(index: number) {
+  activeStep.value = index + 1
+}
 
-// Submit RIS
+// Fetch Step 1 dropdowns
+onMounted(async () => {
+  loading.value = true
+  try {
+    const [regionsRes, officesRes] = await Promise.all([
+      axios.get('http://localhost:8000/api/regions'),
+      axios.get('http://localhost:8000/api/offices/region/1') // TODO: replace 1 with auth user’s region
+    ])
+    regions.value = regionsRes.data
+    offices.value = officesRes.data
+  } catch (error) {
+    console.error('Failed to fetch Step 1 dropdowns', error)
+  } finally {
+    loading.value = false
+  }
+})
+
+// Lazy-load Step 2 dropdowns
+watch(activeStep, async (step) => {
+  if (step === 2 && supplies.value.length === 0) {
+    loading.value = true
+    try {
+      const [suppliesRes, unitsRes, itemTypesRes] = await Promise.all([
+        axios.get('http://localhost:8000/api/supplies'),
+        axios.get('http://localhost:8000/api/units'),
+        axios.get('http://localhost:8000/api/itemtypes')
+      ])
+      supplies.value = suppliesRes.data
+      units.value = unitsRes.data
+      itemTypes.value = itemTypesRes.data
+    } catch (error) {
+      console.error('Failed to fetch Step 2 dropdowns', error)
+    } finally {
+      loading.value = false
+    }
+  }
+})
+
+// --- Submit RIS ---
 const showSuccessModal = ref(false)
 const successMessage = ref('')
 
 async function SubmitRIS() {
+  loading.value = true
   try {
     const payload = {
       ...risData.value,
-      items: items.value.map(item => ({
-        ...item,
-        supply: Number(item.supply),
-        quantity: Number(item.quantity),
-        unit_value: Number(item.unit_value),
-        total_amount: Number(item.total_amount)
+      items: items.value.map(i => ({
+        supply_id: i.supply_id,
+        unit_id: i.unit_id,
+        quantity_requested: i.quantity_requested,
+        quantity_issued: i.quantity_issued ?? null, // can be null
+        description: i.description,
+        remarks: i.remarks
       }))
     }
 
-    await axios.post('http://localhost:8000/api/ris/add', payload, { withCredentials: true })
-    successMessage.value = `✅ RIS submitted successfully!`
+    console.log('RIS Payload:', JSON.stringify(payload, null, 2))
+
+    const res = await axios.post('http://localhost:8000/api/ris', payload, { withCredentials: true })
+
+    successMessage.value = `✅ RIS submitted successfully! Number: ${res.data.ris_number}`
     showSuccessModal.value = true
 
+    // Reset form
     activeStep.value = 1
     risData.value = {
       ris_number: '',
@@ -138,23 +150,40 @@ async function SubmitRIS() {
       showSuccessModal.value = false
       router.push({ name: 'RIS' })
     }, 1500)
-  } catch (error) {
+
+  } catch (error: any) {
     console.error('Failed to submit RIS', error)
-    successMessage.value = '❌ Failed to submit RIS.'
+
+    if (error.response?.status === 422) {
+      const validationErrors = error.response.data.errors
+      const messages = Object.values(validationErrors).flat().join(' | ')
+      successMessage.value = `❌ Validation failed: ${messages}`
+    } else {
+      successMessage.value = error.response?.data?.message ?? '❌ Failed to submit RIS.'
+    }
+
     showSuccessModal.value = true
+  } finally {
+    loading.value = false
   }
 }
 
 watch(showSuccessModal, (val) => {
-  if (val) {
-    setTimeout(() => { showSuccessModal.value = false }, 3000)
-  }
+  if (val) setTimeout(() => { showSuccessModal.value = false }, 3000)
 })
 </script>
 
 <template>
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="relative flex flex-col h-full w-full p-6 gap-8">
+      
+      <!-- Loading Overlay -->
+      <transition name="fade">
+        <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div class="text-white font-semibold text-lg animate-pulse">Loading...</div>
+        </div>
+      </transition>
+
       <!-- Stepper -->
       <div class="flex items-center justify-center w-full max-w-6xl mx-auto">
         <template v-for="(step, index) in steps" :key="index">
@@ -170,21 +199,16 @@ watch(showSuccessModal, (val) => {
                 <component :is="step.icon" class="w-7 h-7" />
               </div>
               <div class="mt-3 text-center">
-                <div class="font-semibold text-sm md:text-base transition-colors"
-                  :class="{ 'text-cyan-600': activeStep === index + 1 }">
+                <div class="font-semibold text-sm md:text-base" :class="{ 'text-cyan-600': activeStep === index + 1 }">
                   {{ step.title }}
                 </div>
-                <div class="text-gray-500 text-xs md:text-sm">
-                  {{ step.description }}
-                </div>
+                <div class="text-gray-500 text-xs md:text-sm">{{ step.description }}</div>
               </div>
             </div>
 
-            <!-- Connector line -->
             <div v-if="index < steps.length - 1" class="flex-1 h-1 mx-3 bg-gray-300 rounded relative">
-              <div
-                class="absolute top-0 left-0 h-1 rounded bg-gradient-to-r from-cyan-500 to-cyan-700 transition-all duration-500"
-                :style="{ width: activeStep > index + 1 ? '100%' : '0%' }"></div>
+              <div class="absolute top-0 left-0 h-1 rounded bg-gradient-to-r from-cyan-500 to-cyan-700 transition-all duration-500"
+                   :style="{ width: activeStep > index + 1 ? '100%' : '0%' }"></div>
             </div>
           </div>
         </template>
@@ -193,20 +217,16 @@ watch(showSuccessModal, (val) => {
       <!-- Step Content -->
       <div class="relative min-h-[200px]">
         <keep-alive>
-          <div v-for="(step, index) in steps" :key="index">
-            <component 
-              :is="step.component"
-              v-show="activeStep === index + 1"
-              v-model:items="items"
-              v-model:ris-data="risData"
-v-bind="index + 1 === 2 ? { supplies, units } : { regions, offices }"
-
-            />
-          </div>
+          <component
+            :is="steps[activeStep - 1].component"
+            v-model:items="items"
+            v-model:ris-data="risData"
+            v-bind="activeStep === 2 ? { supplies, units, itemTypes } : { regions, offices }"
+          />
         </keep-alive>
       </div>
 
-      <!-- Navigation Buttons -->
+      <!-- Navigation -->
       <div class="flex justify-between w-full max-w-4xl mx-auto gap-2 mt-8">
         <button @click="prevStep" :disabled="activeStep === 1"
           class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 disabled:opacity-50 transition">
@@ -226,13 +246,8 @@ v-bind="index + 1 === 2 ? { supplies, units } : { regions, offices }"
 
       <!-- Success Modal -->
       <transition name="fade-scale">
-        <div
-          v-if="showSuccessModal"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-        >
-          <div
-            class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-95"
-          >
+        <div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center">
             <div class="flex justify-center mb-4">
               <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -240,12 +255,7 @@ v-bind="index + 1 === 2 ? { supplies, units } : { regions, offices }"
             </div>
             <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ successMessage }}</h3>
             <p class="text-gray-500 mb-6">Your action has been successfully completed.</p>
-            <button
-              @click="showSuccessModal = false"
-              class="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
-            >
-              Close
-            </button>
+            <button @click="showSuccessModal = false" class="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">Close</button>
           </div>
         </div>
       </transition>

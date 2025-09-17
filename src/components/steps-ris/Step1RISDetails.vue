@@ -5,27 +5,29 @@ import Input from '@/components/ui/input/Input.vue'
 import TextArea from '@/components/ui/textarea/TextArea.vue'
 import { Label } from 'reka-ui'
 
-// Form refs
-const responsibilityCenter = ref('')
-const fundCluster = ref('')
-const risDate = ref('')
-const purpose = ref('')
-const requestedBy = ref('')
-const receivedBy = ref('')
-const approvedBy = ref('')
+// Props from parent
+const props = defineProps({
+  risData: {
+    type: Object,
+    required: true
+  }
+})
 
 // Dropdown data
 const region = ref('')
 const office = ref('')
 const employees = ref<{ id: number; name: string }[]>([])
 
+// Loading state
+const loading = ref(true)
+
 // Load user info + employees under same office
 onMounted(async () => {
+  loading.value = true
   try {
     // 1️⃣ Get logged-in user
-    const userRes = await axios.get('http://localhost:8000/api/user-profile')
+    const userRes = await axios.get('http://localhost:8000/api/user-profile', { withCredentials: true })
     const userData = userRes.data
-    console.log('Logged-in user data:', userData)
 
     // 2️⃣ Fetch division name (for office)
     if (userData.Division) {
@@ -59,78 +61,85 @@ onMounted(async () => {
         region.value = ''
       }
     }
+
+    // Initialize parent risData fields if empty
+    props.risData.region = region.value
+    props.risData.office = office.value
+
   } catch (error) {
     console.error('Error fetching user data:', error)
+  } finally {
+    loading.value = false
   }
 })
-
-
 </script>
-
 
 <template>
   <div class="space-y-4">
-    <div>
-      <Label>Responsibility Center</Label>
-      <Input v-model="responsibilityCenter" />
+    <!-- Loading -->
+    <div v-if="loading" class="flex items-center justify-center py-12 text-gray-500 font-semibold text-lg">
+      Loading...
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <Label>Region</Label>
-        <Input v-model="region" disabled />
-      </div>
-      <div>
-        <Label>Office</Label>
-        <Input v-model="office" disabled />
-      </div>
-    </div>
+    <div v-else>
+      <!-- First Row: Responsibility Center, Fund Cluster, RIS Date -->
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <Label>Responsibility Center</Label>
+          <Input v-model="props.risData.responsibility_center" placeholder="Responsibility Center" />
+        </div>
 
-    <div>
-      <Label>Fund Cluster</Label>
-      <Input v-model="fundCluster" />
-    </div>
+        <div>
+          <Label>Fund Cluster</Label>
+          <Input v-model="props.risData.fund_cluster" placeholder="Fund Cluster" />
+        </div>
 
-    <div>
-      <Label>RIS Date</Label>
-      <Input type="date" v-model="risDate" />
-    </div>
-
-    <div>
-      <Label>Purpose</Label>
-      <TextArea v-model="purpose" />
-    </div>
-
-    <div class="grid grid-cols-3 gap-4">
-      <div>
-        <Label>Requested By</Label>
-        <select
-          v-model="requestedBy"
-          class="w-full border rounded-lg p-2"
-        >
-          <option value="">-- Select --</option>
-          <option v-for="emp in employees" :key="emp.id" :value="emp.name">
-            {{ emp.name }}
-          </option>
-        </select>
+        <div>
+          <Label>RIS Date</Label>
+          <Input type="date" v-model="props.risData.ris_date" />
+        </div>
       </div>
 
-      <div>
-        <Label>Received By</Label>
-        <select
-          v-model="receivedBy"
-          class="w-full border rounded-lg p-2"
-        >
-          <option value="">-- Select --</option>
-          <option v-for="emp in employees" :key="emp.id" :value="emp.name">
-            {{ emp.name }}
-          </option>
-        </select>
+      <!-- Second Row: Region, Office (disabled) -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Region</Label>
+          <Input v-model="props.risData.region" disabled />
+        </div>
+        <div>
+          <Label>Office</Label>
+          <Input v-model="props.risData.office" disabled />
+        </div>
       </div>
 
+      <!-- Purpose -->
       <div>
-        <Label>Approved By</Label>
-        <Input v-model="approvedBy" />
+        <Label>Purpose</Label>
+        <TextArea v-model="props.risData.purpose" />
+      </div>
+
+      <!-- Third Row: Requested By, Received By, Approved By -->
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <Label>Requested By</Label>
+          <select v-model="props.risData.requested_by" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">-- Select --</option>
+            <option v-for="emp in employees" :key="emp.id" :value="emp.name">{{ emp.name }}</option>
+          </select>
+        </div>
+
+        <div>
+          <Label>Received By</Label>
+          <select v-model="props.risData.received_by" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">-- Select --</option>
+            <option v-for="emp in employees" :key="emp.id" :value="emp.name">{{ emp.name }}</option>
+          </select>
+        </div>
+
+        <div>
+          <Label>Approved By</Label>
+          <Input v-model="props.risData.approved_by" />
+        </div>
       </div>
     </div>
   </div>
