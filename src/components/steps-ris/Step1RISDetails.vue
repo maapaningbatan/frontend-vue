@@ -135,10 +135,12 @@ onMounted(async () => {
             <option v-for="emp in employees" :key="emp.id" :value="emp.name">{{ emp.name }}</option>
           </select>
         </div>
-
         <div>
           <Label>Approved By</Label>
-          <Input v-model="props.risData.approved_by" />
+          <select v-model="props.risData.approved_by" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <option value="">-- Select --</option>
+            <option v-for="emp in employees" :key="emp.id" :value="emp.name">{{ emp.name }}</option>
+          </select>
         </div>
       </div>
     </div>
