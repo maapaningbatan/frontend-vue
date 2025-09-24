@@ -136,9 +136,10 @@ const showSuccessModal = ref(false)
 const successMessage = ref('')
 
 async function SubmitRIS() {
-  loading.value = true
+  loading.value = true;
+
   try {
-    // Prepare payload with IDs for backend
+    // Prepare payload to send to backend
     const payload = {
       responsibility_center: risData.value.responsibility_center,
       region_id: risData.value.region_id,
@@ -154,60 +155,70 @@ async function SubmitRIS() {
         unit_id: i.unit_id,
         quantity_requested: i.quantity_requested,
         quantity_issued: i.quantity_issued ?? null,
-        description: i.description,
-        remarks: i.remarks
-      }))
-    }
+        description: i.description ?? null,
+        remarks: i.remarks ?? null,
+      })),
+    };
 
-    console.log('RIS Payload:', JSON.stringify(payload, null, 2))
+    console.log('RIS Payload:', JSON.stringify(payload, null, 2));
 
-    const res = await axios.post('http://localhost:8000/api/ris', payload, { withCredentials: true })
+    // Submit to API
+    const res = await axios.post('http://localhost:8000/api/ris', payload, { withCredentials: true });
 
-    successMessage.value = `✅ RIS submitted successfully! Number: ${res.data.data.ris_number}`
-    showSuccessModal.value = true
+    // Show success message
+    successMessage.value = `✅ RIS submitted successfully! Number: ${res.data.data.ris_number}`;
+    showSuccessModal.value = true;
 
-    // Reset form
-    activeStep.value = 1
-    risData.value = {
-      ris_number: '',
-      responsibility_center: '',
-      region: '',
-      region_id: null,
-      office: '',
-      office_id: null,
-      fund_cluster: '',
-      ris_date: new Date().toISOString().slice(0, 10),
-      purpose: '',
-      requested_by: '',
-      requested_by_id: null,
-      received_by: '',
-      received_by_id: null,
-      approved_by: '',
-      approved_by_id: null
-    }
-    items.value = []
+    // Reset form after submission
+    resetForm();
 
+    // Redirect to RIS index after short delay
     setTimeout(() => {
-      showSuccessModal.value = false
-      router.push({ name: 'RIS' })
-    }, 1500)
+      showSuccessModal.value = false;
+      router.push({ name: 'RISIndex' });
+    }, 1500);
 
   } catch (error: any) {
-    console.error('Failed to submit RIS', error)
+    console.error('Failed to submit RIS', error);
 
     if (error.response?.status === 422) {
-      const validationErrors = error.response.data.errors
-      const messages = Object.values(validationErrors).flat().join(' | ')
-      successMessage.value = `❌ Validation failed: ${messages}`
+      const validationErrors = error.response.data.errors;
+      const messages = Object.values(validationErrors).flat().join(' | ');
+      successMessage.value = `❌ Validation failed: ${messages}`;
     } else {
-      successMessage.value = error.response?.data?.message ?? '❌ Failed to submit RIS.'
+      successMessage.value = error.response?.data?.message ?? '❌ Failed to submit RIS.';
     }
 
-    showSuccessModal.value = true
+    showSuccessModal.value = true;
+
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
+
+// Optional helper function to reset form data
+function resetForm() {
+  activeStep.value = 1;
+  risData.value = {
+    ris_number: '',
+    responsibility_center: '',
+    region: '',
+    region_id: null,
+    office: '',
+    office_id: null,
+    fund_cluster: '',
+    ris_date: new Date().toISOString().slice(0, 10),
+    purpose: '',
+    requested_by: '',
+    requested_by_id: null,
+    received_by: '',
+    received_by_id: null,
+    approved_by: '',
+    approved_by_id: null,
+  };
+  items.value = [];
+}
+
 
 watch(showSuccessModal, (val) => {
   if (val) setTimeout(() => { showSuccessModal.value = false }, 3000)
@@ -218,7 +229,7 @@ watch(showSuccessModal, (val) => {
 <template>
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="relative flex flex-col h-full w-full p-6 gap-8">
-      
+
       <!-- Loading Overlay -->
       <transition name="fade">
         <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -249,8 +260,9 @@ watch(showSuccessModal, (val) => {
             </div>
 
             <div v-if="index < steps.length - 1" class="flex-1 h-1 mx-3 bg-gray-300 rounded relative">
-              <div class="absolute top-0 left-0 h-1 rounded bg-gradient-to-r from-cyan-500 to-cyan-700 transition-all duration-500"
-                   :style="{ width: activeStep > index + 1 ? '100%' : '0%' }"></div>
+              <div
+                class="absolute top-0 left-0 h-1 rounded bg-gradient-to-r from-cyan-500 to-cyan-700 transition-all duration-500"
+                :style="{ width: activeStep > index + 1 ? '100%' : '0%' }"></div>
             </div>
           </div>
         </template>
@@ -259,12 +271,8 @@ watch(showSuccessModal, (val) => {
       <!-- Step Content -->
       <div class="relative min-h-[200px]">
         <keep-alive>
-          <component
-            :is="steps[activeStep - 1].component"
-            v-model:items="items"
-            v-model:ris-data="risData"
-            v-bind="activeStep === 2 ? { supplies, units, itemTypes } : { regions, offices }"
-          />
+          <component :is="steps[activeStep - 1].component" v-model:items="items" v-model:ris-data="risData"
+            v-bind="activeStep === 2 ? { supplies, units, itemTypes } : { regions, offices }" />
         </keep-alive>
       </div>
 
@@ -288,20 +296,22 @@ watch(showSuccessModal, (val) => {
 
       <!-- Success Modal -->
       <transition name="fade-scale">
-        <div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div v-if="showSuccessModal"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center">
             <div class="flex justify-center mb-4">
-              <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ successMessage }}</h3>
             <p class="text-gray-500 mb-6">Your action has been successfully completed.</p>
-            <button @click="showSuccessModal = false" class="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">Close</button>
+            <button @click="showSuccessModal = false"
+              class="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">Close</button>
           </div>
         </div>
       </transition>
     </div>
   </AppLayout>
 </template>
-

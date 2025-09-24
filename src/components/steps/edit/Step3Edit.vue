@@ -24,7 +24,7 @@ function emitUpdate() {
   emit('update:deliveryData', { ...local })
 }
 
-const { invoice_no, invoice_total_amount, po_amount, po_date, dr_no, dr_date, ris_no, ris_date, ors_no, ors_date, dv_no, dv_date, prepared_by } = toRefs(local)
+const { invoice_no, invoice_total_amount,invoice_date, po_amount, po_date, dr_no, dr_date, ris_no, ris_date, ors_no, ors_date, dv_no, dv_date, prepared_by } = toRefs(local)
 </script>
 
 <template>
@@ -39,6 +39,10 @@ const { invoice_no, invoice_total_amount, po_amount, po_date, dr_no, dr_date, ri
       <div>
         <Label>Sales Invoice Total Amount</Label>
         <Input type="number" v-model.number="local.invoice_total_amount" @input="emitUpdate" />
+      </div>
+      <div>
+        <Label>Sales Invoice Date</Label>
+        <DatePicker v-model="local.invoice_date" @update:modelValue="emitUpdate" />
       </div>
       <div>
         <Label>Purchase Order Amount</Label>

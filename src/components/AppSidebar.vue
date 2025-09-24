@@ -31,7 +31,7 @@ const mainNavItems: NavItem[] = [
     items: [
       { title: 'Delivery', href: '/delivery' },
       { title: 'Stock Card', href: '/supplies' },
-{ title: 'RIS', href: '/ris' }
+      { title: 'RIS', href: '/ris' }
     ]
   },
   {

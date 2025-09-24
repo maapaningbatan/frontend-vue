@@ -140,6 +140,7 @@ async function SubmitEditedDelivery() {
       purpose: deliveryData.value.purpose ?? null,
       invoice_no: deliveryData.value.invoice_no ?? null,
       invoice_total_amount: deliveryData.value.invoice_total_amount ?? 0,
+      invoice_date: deliveryData.value.invoice_date ?? null,
       po_amount: deliveryData.value.po_amount ?? 0,
       po_date: deliveryData.value.po_date ?? null,
       dr_no: deliveryData.value.dr_no ?? null,

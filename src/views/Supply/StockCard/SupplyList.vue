@@ -8,6 +8,7 @@ import ActionButtons from '@/components/ui/button/ActionButtons.vue'
 import { WalletCards, Search } from 'lucide-vue-next'
 import Input from '@/components/ui/Input.vue'
 import Paginator from 'primevue/paginator'
+import Loading from '@/components/loading/Loading.vue'
 
 // Router instance
 const router = useRouter()
@@ -135,8 +136,14 @@ function handleEdit(id: number) {
       </div>
 
       <!-- Loading / Error -->
-      <div v-if="loading" class="text-gray-500 text-center py-12">Loading supplies...</div>
-      <div v-else-if="errorMsg" class="text-red-600 text-center py-12">{{ errorMsg }}</div>
+  <div v-if="loading" class="flex flex-col items-center justify-center h-64">
+    <Loading :loading="loading" color="#0ea5e9" size="18px" margin="3px" />
+    <span class="mt-4 text-gray-500 font-medium text-lg">Loading...</span>
+  </div>
+
+  <div v-else-if="errorMsg" class="text-center text-red-500 py-6">
+    {{ errorMsg }}
+  </div>
 
       <!-- Table -->
       <div v-else class="overflow-x-auto rounded-lg shadow border border-gray-200">

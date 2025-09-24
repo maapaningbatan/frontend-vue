@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import ActionButtons from '@/components/ui/button/ActionButtons.vue'
 import { Check } from 'lucide-vue-next'
+import Loading from '@/components/loading/Loading.vue'
 
 // Router instance
 const router = useRouter()
@@ -89,17 +90,21 @@ async function approveDelivery(id: number) {
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
       <!-- Top Actions -->
       <div class="flex justify-end mb-4">
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          @click="goToAddDelivery"
-        >
+        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" @click="goToAddDelivery">
           + Add Delivery
         </button>
       </div>
 
+
       <!-- Loading / Error -->
-      <div v-if="loading" class="text-center text-gray-500 py-6">Loading...</div>
-      <div v-else-if="error" class="text-center text-red-500 py-6">{{ error }}</div>
+ <!-- Loading / Error -->
+<div v-if="loading" class="flex flex-col items-center justify-center h-64">
+  <Loading :loading="loading" color="#0ea5e9" size="18px" margin="3px" />
+  <span class="mt-4 text-gray-500 font-medium text-lg">Loading...</span>
+</div>
+<div v-else-if="error" class="text-center text-red-500 py-6">{{ error }}</div>
+
+
 
       <!-- Table -->
       <div v-else class="overflow-x-auto rounded-lg shadow border border-gray-200">
@@ -121,29 +126,19 @@ async function approveDelivery(id: number) {
           </thead>
 
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr
-              v-for="delivery in deliveries"
-              :key="delivery.delivery_id"
-              class="hover:bg-blue-50 transition"
-            >
-             <td class="px-4 py-3 text-center flex justify-center gap-2">
-  <!-- Existing Action Buttons -->
-  <ActionButtons
-    @edit="handleEdit(delivery.delivery_id)"
-    @delete="deleteDelivery(delivery.delivery_id)"
-  />
+            <tr v-for="delivery in deliveries" :key="delivery.delivery_id" class="hover:bg-blue-50 transition">
+              <td class="px-4 py-3 text-center flex justify-center gap-2">
+                <!-- Existing Action Buttons -->
+                <ActionButtons @edit="handleEdit(delivery.delivery_id)"
+                  @delete="deleteDelivery(delivery.delivery_id)" />
 
-  <!-- ✅ New Approve Button -->
-  <button
-    @click="approveDelivery(delivery.delivery_id)"
-    :disabled="delivery.status === 'Approved'"
-    class="p-2 rounded-full border flex items-center justify-center transition
+                <!-- ✅ New Approve Button -->
+                <button @click="approveDelivery(delivery.delivery_id)" :disabled="delivery.status === 'Approved'" class="p-2 rounded-full border flex items-center justify-center transition
            hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
-           border-blue-700 text-blue-500 hover:bg-blue-100"
-  >
-    <Check class="w-4 h-4" />
-  </button>
-</td>
+           border-blue-700 text-blue-500 hover:bg-blue-100">
+                  <Check class="w-4 h-4" />
+                </button>
+              </td>
 
 
               <td class="px-4 py-3 text-sm text-gray-700">{{ delivery.delivery_id }}</td>
@@ -165,12 +160,9 @@ async function approveDelivery(id: number) {
                 {{ delivery.prepared_by_employee?.full_name || 'N/A' }}
               </td>
               <td class="px-4 py-3 text-sm font-semibold">
-                <span
-                  class="px-2 py-1 rounded text-xs"
-                  :class="delivery.status === 'Approved'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'"
-                >
+                <span class="px-2 py-1 rounded text-xs" :class="delivery.status === 'Approved'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-yellow-100 text-yellow-700'">
                   {{ delivery.status }}
                 </span>
               </td>
@@ -187,8 +179,7 @@ async function approveDelivery(id: number) {
 
         <!-- Footer -->
         <div
-          class="bg-gray-50 px-4 py-2 text-gray-700 text-sm rounded-b-lg border-t border-gray-200 flex justify-between items-center"
-        >
+          class="bg-gray-50 px-4 py-2 text-gray-700 text-sm rounded-b-lg border-t border-gray-200 flex justify-between items-center">
           <span>
             Showing <strong>{{ deliveries.length }}</strong> entries
           </span>

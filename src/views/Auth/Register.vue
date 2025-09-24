@@ -4,12 +4,12 @@
   >
     <div class="flex w-full max-w-6xl bg-white shadow-2xl rounded-3xl overflow-hidden">
       <!-- LEFT SIDE (IMAGE, hidden on small) -->
-      <div class="hidden lg:flex w-1/2 items-center justify-center bg-blue-100">
-        <img src="/images/Image2.png" alt="Illustration" class="w-3/4" />
+<div class="hidden lg:flex w-1/3 items-center justify-center bg-blue-100">
+        <img src="/images/image2.png" alt="Illustration" class="w-3/4" />
       </div>
 
       <!-- RIGHT SIDE (Form) -->
-      <div class="flex flex-col w-full lg:w-1/2 p-8">
+<div class="flex flex-col w-full lg:w-2/3 p-8">
         <!-- Logo + Title -->
         <div class="flex items-center space-x-4 mb-6">
           <img src="/images/logo.png" alt="Logo" class="w-12 sm:w-14 h-auto" />
@@ -73,7 +73,7 @@
                     class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
                   />
                   <Input
-                    v-model="form.email_address"
+                    v-model="form.email"
                     type="email"
                     class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
                     placeholder="Enter your Email"
@@ -281,156 +281,8 @@
             </div>
           </div>
 
-          <!-- Step 3: Employee Details -->
-          <div v-if="currentStep === 2" class="p-6">
-            <div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <label class="block text-sm font-medium mb-1"
-                  >Employee ID<span class="text-red-500">*</span></label
-                >
-                <div class="relative">
-                  <FolderPen
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                  />
-                  <Input
-                    v-model="form.employee_id"
-                    type="text"
-                    class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                    placeholder="Employee ID"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1"
-                    >Position<span class="text-red-500">*</span></label
-                  >
-                  <div class="relative">
-                    <BriefcaseBusiness
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                    />
-                    <Select
-                      v-model="form.position"
-                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                      :options="
-                        positions.map((pos) => ({ value: pos.Position_Id, label: pos.Position }))
-                      "
-                      placeholder="Select Position"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1"
-                    >Region<span class="text-red-500">*</span></label
-                  >
-                  <div class="relative">
-                    <Globe
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                    />
-                    <Select
-                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                      v-model="form.region"
-                      :options="regions.map((r) => ({ value: r.Region_Id, label: r.Region }))"
-                      placeholder="Select Region"
-                    />
-                  </div>
-                </div>
+<!-- Step 3: Employee Details --> <div v-if="currentStep === 2" class="p-6"> <div> <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <!-- Employee ID --> <div> <label class="block text-sm font-medium mb-1"> Employee ID <span class="text-red-500">*</span> </label> <div class="relative"> <FolderPen class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Input v-model="form.employee_no" type="text" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" placeholder="Employee ID" /> </div> </div> <!-- Position --> <div> <label class="block text-sm font-medium mb-1"> Position <span class="text-red-500">*</span> </label> <div class="relative"> <BriefcaseBusiness class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Select v-model="form.position_id" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" :options=" positions.map((pos) => ({ value: pos.id, label: pos.position_desc })) " placeholder="Select Position" /> </div> </div> <!-- Region --> <div> <label class="block text-sm font-medium mb-1"> Region <span class="text-red-500">*</span> </label> <div class="relative"> <Globe class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Select v-model="form.region_id" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" :options="regions.map((r) => ({ value: r.id, label: r.region_code }))" placeholder="Select Region" /> </div> </div> <!-- Office --> <div> <label class="block text-sm font-medium mb-1"> Office <span class="text-red-500">*</span> </label> <div class="relative"> <Building2 class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Select v-model="form.office_id" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" :options="offices.map((o) => ({ value: o.id, label: o.office_desc }))" placeholder="Select Office" :disabled="!form.region_id" /> </div> </div> <!-- Division --> <div> <label class="block text-sm font-medium mb-1"> Division <span class="text-red-500">*</span> </label> <div class="relative"> <Building class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Select v-model="form.division_id" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" :options=" divisions.map((d) => ({ value: d.id, label: d.division_desc })) " placeholder="Select Division" :disabled="!form.office_id" /> </div> </div> <!-- Cluster --> <div> <label class="block text-sm font-medium mb-1"> Cluster <span class="text-red-500">*</span> </label> <div class="relative"> <IdCardLanyard class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Select v-model="form.cluster_id" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" :options=" clusters.map((c) => ({ value: c.Cluster_Id, label: c.Cluster_Desc })) " placeholder="Select Cluster" /> </div> </div> <div> <label class="block text-sm font-medium mb-1"> Center <span class="text-red-500">*</span> </label> <div class="relative"> <Building2 class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Select v-model="form.center_id" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" :options="centers.map((c) => ({ value: c.center_id, label: c.center_desc }))" placeholder="Select Center" /> </div> </div> <!-- SOA --> <div> <label class="block text-sm font-medium mb-1"> SOA <span class="text-red-500">*</span> </label> <div class="relative"> <UserCog class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" /> <Select v-model="form.soa_id" class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm" :options=" soas.map((s) => ({ value: s.SOA_Id, label: s.Status_of_Appointment })) " placeholder="Select SOA" /> </div> </div> </div> </div> </div>
 
-                <!-- Office -->
-                <div>
-                  <label class="block text-sm font-medium mb-1"
-                    >Office<span class="text-red-500">*</span></label
-                  >
-                  <div class="relative">
-                    <Building2
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                    />
-                    <Select
-                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                      v-model="form.office"
-                      :options="offices.map((o) => ({ value: o.Office_Id, label: o.Office_Desc }))"
-                      placeholder="Select Office"
-                      :disabled="!form.region"
-                    />
-                  </div>
-                </div>
-
-                <!-- Division -->
-                <div>
-                  <label class="block text-sm font-medium mb-1"
-                    >Division<span class="text-red-500">*</span></label
-                  >
-                  <div class="relative">
-                    <Building
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                    />
-                    <Select
-                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                      v-model="form.division"
-                      :options="
-                        divisions.map((d) => ({ value: d.Division_Id, label: d.Division_Desc }))
-                      "
-                      placeholder="Select Division"
-                      :disabled="!form.office"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium mb-1"
-                    >Cluster<span class="text-red-500">*</span></label
-                  >
-                  <div class="relative">
-                    <IdCardLanyard
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                    />
-                    <Select
-                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                      v-model="form.cluster"
-                      :options="
-                        clusters.map((c) => ({ value: c.Cluster_Id, label: c.Cluster_Desc }))
-                      "
-                      placeholder="Select Cluster"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1"
-                    >SOA<span class="text-red-500">*</span></label
-                  >
-                  <div class="relative">
-                    <UserCog
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                    />
-                    <Select
-                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                      v-model="form.soa"
-                      :options="
-                        soas.map((s) => ({ value: s.SOA_Id, label: s.Status_of_Appointment }))
-                      "
-                      placeholder="Select SOA"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1"
-                    >User Level<span class="text-red-500">*</span></label
-                  >
-                  <div class="relative">
-                    <UserLock
-                      class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                    />
-                    <Select
-                      class="input w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-600 text-sm"
-                      v-model="form.user_level"
-                      :options="
-                        user_levels.map((u) => ({ value: u.Userlevel_Id, label: u.Userlevel }))
-                      "
-                      placeholder="Select User Level"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- Step 4: Upload -->
           <div v-if="currentStep === 3" class="space-y-4">
@@ -478,7 +330,9 @@
           </div>
           <p class="text-sm text-gray-600 text-center mt-6">
             Already have an account?
-          <router-link to="/auth/login" class="text-cyan-600 font-semibold hover:underline" >Go to Login</router-link>
+            <router-link to="/auth/login" class="text-cyan-600 font-semibold hover:underline"
+              >Go to Login</router-link
+            >
           </p>
         </form>
       </div>
@@ -487,26 +341,6 @@
 </template>
 
 <script setup>
-function validateForm() {
-  // reset errors
-  Object.keys(errors).forEach((k) => delete errors[k])
-
-  if (!form.username) errors.username = 'Please insert username'
-  if (!form.email_address) errors.email_address = 'Please insert email'
-  if (!form.password) errors.password = 'Please insert password'
-  if (form.password !== form.password_confirmation) {
-    errors.password_confirmation = 'Passwords do not match'
-  }
-  if (!form.first_name) errors.first_name = 'Please insert first name'
-  if (!form.last_name) errors.last_name = 'Please insert last name'
-  if (!form.region) errors.region = 'Please select region'
-  if (!form.office) errors.office = 'Please select office'
-  if (divisions.value.length > 0 && !form.division) {
-    errors.division = 'Please select division'
-  }
-  // return true if valid
-  return Object.keys(errors).length === 0
-}
 import { ref, reactive, onMounted, watch } from 'vue'
 import axios from 'axios'
 import Input from '@/components/ui/input/Input.vue'
@@ -526,16 +360,16 @@ import {
   Globe,
   Building2,
   Building,
-  Group,
   IdCardLanyard,
   UserCog,
-  UserLock,
 } from 'lucide-vue-next'
 
+// Set base URL for all Axios requests
+axios.defaults.baseURL = 'http://localhost:8000/api'
+
+// Stepper
 const steps = ['User Credentials', 'Personal Info', 'Employee Details', 'Upload']
 const currentStep = ref(0)
-
-const emit = defineEmits(['update-success', 'toggle'])
 const router = useRouter()
 
 // Dropdown data
@@ -545,12 +379,13 @@ const offices = ref([])
 const divisions = ref([])
 const clusters = ref([])
 const soas = ref([])
-const user_levels = ref([])
+const userLevels = ref([])
+const centers = ref([])
 
-// Form state
+// Form data
 const form = reactive({
   username: '',
-  email_address: '',
+  email: '',
   password: '',
   password_confirmation: '',
   honorifics: '',
@@ -558,146 +393,154 @@ const form = reactive({
   middle_name: '',
   last_name: '',
   suffix: '',
-  sex: '',
   title: '',
+  sex: '',
   contact_number: '',
   address: '',
-  employee_id: '',
-  position: '',
-  region: '',
-  office: '',
-  division: '',
-  cluster: '',
-  user_level: '',
-  soa: '',
+  employee_no: '',
+  position_id: '',
+  region_id: '',
+  office_id: '',
+  division_id: '',
+  cluster_id: '',
+  user_level_id: '',
+  soa_id: '',
   upload_contract: null,
+  center_id: '',
 })
 
-const nextStep = () => {
-  if (currentStep.value < steps.length - 1) currentStep.value++
-}
-
-const prevStep = () => {
-  if (currentStep.value > 0) currentStep.value--
-}
-
-const successMessage = ref('')
+// Validation errors
 const errors = reactive({})
+const successMessage = ref('')
 const errorMessage = ref('')
+const loading = ref(false)
 
-// Fetch initial dropdowns
+// Validate form before submission
+function validateForm() {
+  Object.keys(errors).forEach((k) => delete errors[k])
+
+  if (!form.username) errors.username = 'Please enter username'
+  if (!form.email) errors.email = 'Please enter email'
+  if (!form.password) errors.password = 'Please enter password'
+  if (form.password !== form.password_confirmation)
+    errors.password_confirmation = 'Passwords do not match'
+  if (!form.first_name) errors.first_name = 'Please enter first name'
+  if (!form.last_name) errors.last_name = 'Please enter last name'
+  if (!form.region_id) errors.region_id = 'Please select region'
+  if (offices.value.length && !form.office_id) errors.office_id = 'Please select office'
+  if (divisions.value.length && !form.division_id) errors.division_id = 'Please select division'
+
+  return Object.keys(errors).length === 0
+}
+
+// Fetch dropdowns on mount
 onMounted(async () => {
   try {
-    const [positionsRes, regionsRes, clustersRes, soasRes, userLevelsRes] = await Promise.all([
-      axios.get('http://localhost:8000/api/positions'),
-      axios.get('http://localhost:8000/api/regions'),
-      axios.get('http://localhost:8000/api/clusters'),
-      axios.get('http://localhost:8000/api/status-of-appointments'),
-      axios.get('http://localhost:8000/api/user-levels'),
+    const [posRes, regRes, clusRes, soaRes, ulRes, cenRes] = await Promise.all([
+      axios.get('/positions'),
+      axios.get('/regions'),
+      axios.get('/clusters'),
+      axios.get('/status-of-appointments'),
+      axios.get('/user-levels'),
+      axios.get('/centers'),
     ])
-
-    positions.value = positionsRes.data
-    regions.value = regionsRes.data
-    clusters.value = clustersRes.data
-    soas.value = soasRes.data
-    user_levels.value = userLevelsRes.data
-  } catch (error) {
-    console.error('Error fetching dropdowns:', error)
+    positions.value = posRes.data
+    regions.value = regRes.data
+    clusters.value = clusRes.data
+    soas.value = soaRes.data
+    userLevels.value = ulRes.data
+    centers.value = cenRes.data
+  } catch (err) {
+    console.error('Error fetching dropdowns:', err)
   }
 })
 
-// Cascading: Region → Office
+// Watch Region → fetch Offices
+watch(() => form.region_id, async (regionId) => {
+  offices.value = []
+  form.office_id = null
+  divisions.value = []
+  form.division_id = null
 
-watch(
-  () => form.region,
-  async (newRegion) => {
-    if (newRegion) {
-      try {
-        const res = await axios.get(`http://localhost:8000/api/offices/region/${newRegion}`)
-        offices.value = res.data
-        form.office = null
-        divisions.value = []
-        form.division = null
-      } catch (error) {
-        console.error('Error fetching offices for region:', error)
-      }
-    } else {
-      offices.value = []
-      form.office = null
-      divisions.value = []
-      form.division = null
-    }
-  },
-)
-// Cascading: Office → Division
-watch(
-  () => form.office,
-  async (newOffice) => {
-    if (newOffice) {
-      try {
-        const res = await axios.get(`http://localhost:8000/api/divisions/office/${newOffice}`)
-        divisions.value = res.data
-        form.division = null
-      } catch (error) {
-        console.error('Error fetching divisions for office:', error)
-      }
-    } else {
-      divisions.value = []
-      form.division = null
-    }
-  },
-)
+  if (!regionId) return
 
-// File upload
+  try {
+    const res = await axios.get(`/offices/region/${regionId}`)
+    offices.value = res.data
+  } catch (err) {
+    console.error('Error fetching offices:', err.response?.data || err.message)
+  }
+})
+
+// Watch Office → fetch Divisions
+watch(() => form.office_id, async (officeId) => {
+    console.log("Selected office_id:", officeId)   // ✅ should log when you pick an office
+  divisions.value = []
+  form.division_id = null
+
+  if (!officeId) return
+
+  try {
+    const res = await axios.get(`/divisions/office/${officeId}`)
+        console.log("Division API response:", res.data)  // 👀 check this
+
+    divisions.value = res.data
+  } catch (err) {
+    console.error('Error fetching divisions:', err.response?.data || err.message)
+  }
+})
+
+// Handle file upload
 function handleFileUpload(event) {
   form.upload_contract = event.target.files[0] || null
 }
 
-// Submit form
-async function register() {
-  if (!validateForm()) {
-    return // stop if errors exist
-  }
+// Step navigation
+const nextStep = () => {
+  if (currentStep.value < steps.length - 1) currentStep.value++
+}
+const prevStep = () => {
+  if (currentStep.value > 0) currentStep.value--
+}
 
-  if (!form.division) {
-    form.division = null
-  }
+// Submit registration
+async function register() {
+  if (!validateForm()) return
+
+  loading.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+
   try {
     const formData = new FormData()
-    Object.keys(form).forEach((key) => {
-      if (form[key] instanceof File) {
-        formData.append(key, form[key])
-      } else if (form[key] === null || form[key] === undefined) {
-        formData.append(key, '') // let backend handle nullable conversion
-      } else {
-        formData.append(key, form[key])
-      }
-    })
+    for (const key in form) {
+      if (form[key] instanceof File) formData.append(key, form[key])
+else if (form[key] !== null && form[key] !== '') {
+  formData.append(key, form[key])
+}    }
 
-    const res = await axios.post('http://localhost:8000/api/register', formData, {
+    const res = await axios.post('/register', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
 
     if (res.status === 201 || res.status === 200) {
-      successMessage.value =
-        "Register Successfully! Please contact Administrator for Activation of Account"
-
-      // save success message so Auth.vue can show it
-      localStorage.setItem("registerSuccess", successMessage.value)
-
-      // redirect to /auth (default to Login view)
-      setTimeout(() => {
-        router.push({ path: "/auth", query: { view: "login" } })
-      }, 500)
+      successMessage.value = 'Registration successful! Contact admin for activation.'
+      setTimeout(() => router.push({ path: '/auth/login' }), 1000)
     }
-  } catch (error) {
-    console.error(error)
-    errorMessage.value = error.response?.data?.message || "Registration failed"
+  } catch (err) {
+    if (err.response?.status === 422) {
+      Object.assign(errors, err.response.data.errors)
+    } else {
+      errorMessage.value = err.response?.data?.message || 'Registration failed'
+    }
+    console.error(err)
+  } finally {
+    loading.value = false
   }
 }
-
-
 </script>
+
+
 
 <style scoped>
 .input {

@@ -24,9 +24,9 @@
         </div>
 
         <div>
-  <Label class="block text-gray-700">Purchase Order Date</Label>
+  <Label class="block text-gray-700">Sales Invoice Date</Label>
   <DatePicker
-    v-model="props.deliveryData.po_date" placeholder="Select Purchase Order Date"
+    v-model="props.deliveryData.invoice_date" placeholder="Select Sales Invoice Date"
     class="w-full border-gray-300 rounded-md p-2"
   />
 </div>

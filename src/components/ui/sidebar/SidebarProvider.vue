@@ -73,15 +73,14 @@ provideSidebarContext({
 
 <template>
   <TooltipProvider :delay-duration="0">
-    <div
-      data-slot="sidebar-wrapper"
-      :style="{
-        '--sidebar-width': SIDEBAR_WIDTH,
-        '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
-      }"
-      :class="cn('group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full bg-gray-100', props.class)"
-      v-bind="$attrs"
-    >
+    <div data-slot="sidebar-wrapper" :style="{
+      '--sidebar-width': SIDEBAR_WIDTH,
+      '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
+    }" :class="cn(
+        'group-sidebar-wrapper flex min-h-screen w-full bg-white text-gray-800 shadow-sm rounded-r-xl transition-all duration-300',
+        'hover:bg-gray-50', // subtle hover background when expanded
+        props.class
+      )" v-bind="$attrs">
       <slot />
     </div>
   </TooltipProvider>

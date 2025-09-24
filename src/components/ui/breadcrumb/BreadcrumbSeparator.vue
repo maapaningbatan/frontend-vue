@@ -12,10 +12,12 @@ const props = defineProps({
     data-slot="breadcrumb-separator"
     role="presentation"
     aria-hidden="true"
-    :class="cn('[&>svg]:size-3.5', props.class)"
+    :class="cn('flex items-center', props.class)"
   >
     <slot>
-      <ChevronRight />
+      <ChevronRight 
+        class="w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform duration-200 hover:text-blue-500 hover:scale-110"
+      />
     </slot>
   </li>
 </template>

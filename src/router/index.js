@@ -21,7 +21,6 @@ import PropertyIssuanceEdit from '@/views/Property/PropertyIssuance/PropertyIssu
 import RISIndex from '@/views/Supply/RIS/RISIndex.vue'
 import RISAdd from '@/views/Supply/RIS/RISAdd.vue'
 
-
 const routes = [
   // Default → redirect to /login
   { path: '/', redirect: '/login' },
@@ -69,17 +68,15 @@ const routes = [
   { path: '/semi-expandable', component: SemiExIndex, name: 'SemiExIndex' },
   { path: '/semi-expandable/:id', component: SemiExCard, name: 'SemiExCard' },
 
-  {path:'/property-issuance',component:PropertyIssuanceIndex,name:'PropertyIssuanceIndex'},
- { 
-  path:'/property-issuance/:type/:id/edit',
-  component: PropertyIssuanceEdit,
-  name: 'PropertyIssuanceEdit',
-  props: true
-},
-// RIS
+  { path: '/property-issuance', component: PropertyIssuanceIndex, name: 'PropertyIssuanceIndex' },
+  {
+    path: '/property-issuance/:type/:id/edit',
+    component: PropertyIssuanceEdit,
+    name: 'PropertyIssuanceEdit',
+    props: true,
+  },
   { path: '/ris', component: RISIndex, name: 'RISIndex' },
   { path: '/ris/add', component: RISAdd, name: 'RISAdd' },
-
 
   // Catch-all → redirect to login
   { path: '/:pathMatch(.*)*', redirect: '/login' },
