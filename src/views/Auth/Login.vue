@@ -2,16 +2,6 @@
   <div
     class="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-100 p-6"
   >
-    <!-- Toast message -->
-    <div
-      v-if="toastMessage"
-      :class="[
-        'fixed top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow z-50 transition-opacity duration-500',
-        isError ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800',
-      ]"
-    >
-      {{ toastMessage }}
-    </div>
 
     <!-- Form Container -->
     <div
@@ -21,6 +11,17 @@
       <div
         class="w-full sm:w-1/2 px-6 sm:px-12 lg:px-20 py-10 sm:py-16 flex flex-col justify-center select-none"
       >
+
+        <!-- Registration success message -->
+  <p v-if="registerMessage" class="text-green-600 text-center mb-4">
+    {{ registerMessage }}
+  </p>
+
+  <!-- Toast / login messages -->
+  <p v-if="toastMessage" :class="isError ? 'text-red-600' : 'text-green-600'" class="text-center mb-4">
+    {{ toastMessage }}
+  </p>
+
         <!-- Logo + Title -->
         <div class="flex items-center space-x-4 mb-6">
           <img
@@ -185,6 +186,7 @@ const captchaError = ref('')
 const showPassword = ref(false)
 const toastMessage = ref('')
 const isError = ref(false)
+const registerMessage = ref('')
 
 // Generate random captcha
 function generateCaptcha() {
@@ -245,6 +247,9 @@ async function login() {
 
 // Show success message after registration
 onMounted(() => {
+  registerMessage.value = sessionStorage.getItem('registerSuccess') || ''
+  sessionStorage.removeItem('registerSuccess') // remove after showing// 
+  
   generateCaptcha()
 })
 </script>

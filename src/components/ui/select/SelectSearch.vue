@@ -11,6 +11,8 @@
         @keydown.enter.prevent="selectHighlighted"
         type="text"
         :placeholder="placeholder"
+          :disabled="!props.options || props.options.length === 0"
+
         :class="cn(
           'w-full h-11 sm:h-10 rounded-xl border border-gray-300 bg-gray-50 px-4 pr-10 text-base sm:text-sm text-gray-700 shadow-sm outline-none transition-all duration-200 ease-in-out',
           'focus:border-blue-500 focus:ring-1 focus:ring-blue-400 focus:ring-offset-0 hover:border-blue-400',
