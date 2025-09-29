@@ -103,6 +103,15 @@ const mainNavItems: NavItem[] = [
       { title: 'User Account', href: '/library/user-account' }
     ]
   },
+  {
+    title: 'Access Control',
+    href: '#',
+    icon: FileX,
+    items: [
+      { title: 'User Level', href: '/access-control/user-levels' },
+      { title: 'Roles and Permission', href: '/library/office' }
+    ]
+  },
 ]
 
 const footerNavItems: NavItem[] = [

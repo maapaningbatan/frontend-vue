@@ -20,6 +20,9 @@ import PropertyIssuanceIndex from '@/views/Property/PropertyIssuance/PropertyIss
 import PropertyIssuanceEdit from '@/views/Property/PropertyIssuance/PropertyIssuanceEdit.vue'
 import RISIndex from '@/views/Supply/RIS/RISIndex.vue'
 import RISAdd from '@/views/Supply/RIS/RISAdd.vue'
+import UserLevelIndex from '@/views/AccessControl/UserLevelIndex.vue'
+import UserLevelPermissions from '@/views/AccessControl/UserLevelPermissions.vue'
+
 
 const routes = [
   // Default → redirect to /login
@@ -80,6 +83,23 @@ const routes = [
 
   // Catch-all → redirect to login
   { path: '/:pathMatch(.*)*', redirect: '/login' },
+
+  {
+    path: '/access-control/user-levels',
+    name: 'UserLevelIndex',
+    component: UserLevelIndex,
+    meta: {
+      title: 'User Levels',
+      requiresAuth: true, // optional if you have auth middleware
+    },
+  },
+{
+  path: '/access-control/user-levels/:id/permissions',
+  name: 'UserLevelPermissions',
+  component: () => import('@/views/AccessControl/UserLevelPermissions.vue'),
+  props: true
+},
+  
 ]
 
 const router = createRouter({
