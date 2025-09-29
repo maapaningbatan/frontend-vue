@@ -19,7 +19,6 @@ function close() {
 <template>
   <li data-slot="sidebar-menu-item" data-sidebar="menu-item" @mouseenter="open" @mouseleave="close" :class="cn(
     'group/menu-item relative rounded-md transition-colors duration-200',
-    'hover:bg-gradient-to-r hover:from-cyan-500 hover:to-cyan-700 hover:text-white',
     className
   )">
     <slot />

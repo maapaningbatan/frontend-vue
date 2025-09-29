@@ -1,201 +1,172 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
 import AppLayout from '@/components/layouts/AppLayout.vue'
 import { type BreadcrumbItem } from '@/types/api'
-import { WalletCards, Search } from 'lucide-vue-next'
-import Input from '@/components/ui/Input.vue'
-import Paginator from 'primevue/paginator'
-import ActionButtons from '@/components/ui/button/ActionButtons.vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import Loading from '@/components/loading/Loading.vue'
+import Pagination from '@/components/ui/pagination/Pagination.vue'
+import AddButton from '@/components/ui/button/AddButton.vue'
+import BaseTable from '@/components/ui/table/BaseTable.vue'
+import EditButton from '@/components/ui/button/EditButton.vue'
+import DeleteButton from '@/components/ui/button/DeleteButton.vue'
+import CardButton from '@/components/ui/button/CardButton.vue'
+import SearchInput from '@/components/ui/search/SearchInput.vue'
 
+// Router
 const router = useRouter()
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Dashboard', href: '/dashboard' },
+  { title: 'Property Management', href: '#' },
   { title: 'Property Card', href: '/property-card' },
 ]
 
-// Table state
+// State
 const propertyCards = ref<any[]>([])
-const totalRecords = ref(0)
 const loading = ref(true)
-const currentPage = ref(1)
-const rowsPerPage = ref(10)
+const error = ref<string | null>(null)
 const searchQuery = ref('')
-const activeFilter = ref<'active' | 'inactive' | 'all'>('all')
 
-// Fetch property cards from API
-async function fetchPropertyCards(page = 1, rows = 10) {
-  loading.value = true
+// Pagination
+const currentPage = ref(1)
+const perPage = ref(10)
+
+// Columns
+const columns: { key: string; label: string; align?: 'left' | 'center' | 'right' }[] = [
+  { key: 'actions', label: 'Actions', align: 'center' },
+  { key: 'supply_id', label: 'Supplies ID', align: 'left' },
+  { key: 'stock_no', label: 'Stock Number', align: 'left' },
+  { key: 'category', label: 'Category', align: 'left' },
+  { key: 'description', label: 'Description', align: 'left' },
+  { key: 'unit', label: 'Unit', align: 'center' },
+  { key: 'unit_value', label: 'Unit Value', align: 'right' },
+  { key: 'balance', label: 'Stockpile Qty', align: 'center' },
+  { key: 'non_stockpile', label: 'Non-Stockpile Qty', align: 'center' },
+  { key: 'reorder_point', label: 'Re-Order Point', align: 'center' },
+]
+
+// Computed search filter
+const filteredCards = computed(() => {
+  if (!searchQuery.value) return propertyCards.value
+  const query = searchQuery.value.toLowerCase()
+  return propertyCards.value.filter((card) => {
+    const values = [
+      card.supply_id,
+      card.stock_no,
+      card.category,
+      card.description,
+      card.unit,
+      card.unit_value,
+      card.balance,
+      card.non_stockpile,
+      card.reorder_point,
+    ]
+    return values.some((val) => val && String(val).toLowerCase().includes(query))
+  })
+})
+
+// Paginated
+const paginatedCards = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value
+  const end = start + perPage.value
+  return filteredCards.value.slice(start, end)
+})
+
+// Helpers for footer
+const total = computed(() => filteredCards.value.length)
+const startItem = computed(() => (total.value === 0 ? 0 : (currentPage.value - 1) * perPage.value + 1))
+const endItem = computed(() => Math.min(currentPage.value * perPage.value, total.value))
+
+// Fetch API
+async function fetchPropertyCards() {
   try {
-    const url = new URL('http://127.0.0.1:8000/api/property-cards')
-    url.searchParams.set('page', page.toString())
-    url.searchParams.set('per_page', rows.toString())
-    if (searchQuery.value) url.searchParams.set('search', searchQuery.value)
-    if (activeFilter.value !== 'all') url.searchParams.set('status', activeFilter.value)
-
-    const res = await fetch(url.toString())
-    if (!res.ok) throw new Error('Failed to fetch data')
-    const data = await res.json()
-
-    propertyCards.value = data.data
-    totalRecords.value = data.total
+    const res = await axios.get('http://127.0.0.1:8000/api/property-cards')
+    propertyCards.value = res.data.data.map((card: any) => ({
+      ...card,
+      stock_no: card.supply?.StockNo ?? '-',
+      category: card.supply?.category?.category_desc ?? '-',
+      description: card.supply?.Supplies_Desc ?? '-',
+      unit: card.supply?.unit?.Unit_Type ?? '-',
+      unit_value: card.supply?.UnitValue ?? '-',
+      balance: card.balance ?? 0,
+      non_stockpile: card.supply?.supplies_nonstock_qty ?? 0,
+      reorder_point: card.supply?.Supplies_ReOrder_PT ?? '-',
+    }))
   } catch (err) {
     console.error(err)
+    error.value = 'Failed to load property cards'
   } finally {
     loading.value = false
   }
 }
+onMounted(fetchPropertyCards)
 
-// Watchers for search or filter changes
-watch([searchQuery, activeFilter], () => {
-  fetchPropertyCards(1, rowsPerPage.value)
-})
-
-// Pagination handler
-function onPageChange(event: { page: number; rows: number }) {
-  currentPage.value = event.page + 1
-  rowsPerPage.value = event.rows
-  fetchPropertyCards(currentPage.value, rowsPerPage.value)
+// Handlers
+function addPropertyCard() {
+  router.push('/property-card/add')
 }
-
-// Toggle Active/Inactive filter
-function setFilter(filter: 'active' | 'inactive' | 'all') {
-  activeFilter.value = filter
+function handleEdit(id: number) {
+  router.push(`/property-card/edit/${id}`)
 }
-
-// Edit / Delete handlers
-function handleEdit(cardId: number) {
-  router.push(`/property-card/edit/${cardId}`)
+function handleDelete(id: number) {
+  console.log('Delete property card:', id)
 }
-
-function handleDelete(cardId: number) {
-  console.log('Delete property card:', cardId)
-  // Add delete logic here
-}
-
-// Initial load
-onMounted(() => {
-  fetchPropertyCards(currentPage.value, rowsPerPage.value)
-})
 </script>
 
 <template>
   <AppLayout :breadcrumbs="breadcrumbs">
-    <div class="flex flex-col gap-6 p-6">
+    <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
       <!-- Header -->
-      <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800 text-center sm:text-left">
-          Property Card
-        </h1>
-      </div>
-
-      <!-- Filters + Add -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-          <!-- Search -->
-          <div class="relative w-full sm:w-64">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input v-model="searchQuery" type="text" placeholder="Search by Stock Number or Description..."
-              class="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-          </div>
-
-          <!-- Active/Inactive -->
-          <div class="relative inline-flex bg-gray-200 rounded-full p-1 w-max">
-            <label @click="setFilter('active')"
-              class="cursor-pointer px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center justify-center"
-              :class="activeFilter === 'active' ? 'text-white' : 'text-gray-700'">
-              Active Only
-            </label>
-            <label @click="setFilter('inactive')"
-              class="cursor-pointer px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center justify-center"
-              :class="activeFilter === 'inactive' ? 'text-white' : 'text-gray-700'">
-              Inactive Only
-            </label>
-            <span class="absolute top-1 left-1 rounded-full w-1/2 h-full transition duration-300" :style="{
-              transform: activeFilter === 'active' ? 'translateX(0%)' : 'translateX(100%)',
-              backgroundColor: activeFilter === 'active' ? '#2563EB' : '#DC2626'
-            }"></span>
-          </div>
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-center sm:text-left">
+          <h1 class="text-xl font-bold text-gray-800">Property Card</h1>
+          <p class="text-sm text-gray-500 mt-1">Manage property items - track allocation, status, and details.</p>
         </div>
-
-        <!-- Add button -->
-        <div>
-          <button
-            class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 hover:shadow-lg transition duration-300">
-            + Add Property Card
-          </button>
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <SearchInput v-model="searchQuery" placeholder="Search" class="w-full sm:w-64" />
+          <AddButton label="+ Add Property Card" @click="addPropertyCard" />
         </div>
       </div>
+
+      <!-- Loading / Error -->
+      <div v-if="loading" class="flex flex-col items-center justify-center h-64">
+        <Loading :loading="loading" color="#0ea5e9" size="18px" margin="3px" />
+        <span class="mt-4 text-gray-500 font-medium text-lg">Loading...</span>
+      </div>
+      <div v-else-if="error" class="text-center text-red-500 py-6">{{ error }}</div>
 
       <!-- Table -->
-      <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200" :class="{ 'opacity-50 pointer-events-none': loading }">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Supplies ID</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Stock Number</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Category</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Description</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Unit</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Unit Value</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Stockpile Qty</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Non-Stockpile Qty</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Re-Order Point</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="card in propertyCards" :key="card.property_card_id"
-              class="hover:bg-blue-50 transition duration-200">
-              <!-- Actions -->
-              <td class="px-4 py-3 flex gap-2">
-                <ActionButtons @edit="handleEdit(card.property_card_id)"
-                  @delete="handleDelete(card.property_card_id)" />
-                <button @click="router.push(`/property-card/${card.supply_id}`)"
-                  class="w-8 h-8 flex items-center justify-center rounded-full border border-blue-500 text-blue-500 hover:bg-blue-100 transition duration-200"
-                  title="View Property Card">
-                  <WalletCards class="w-4 h-4" />
-                </button>
+      <div v-else class="overflow-x-auto rounded-lg shadow border border-gray-200">
+        <BaseTable :columns="columns" :items="paginatedCards" striped>
+          <!-- Actions -->
+          <template #actions="{ row }">
+            <div class="flex justify-center gap-2">
+              <EditButton @click="handleEdit(row.property_card_id)" size="sm" tooltip="Edit" />
+              <DeleteButton @delete="handleDelete(row.property_card_id)" size="sm" tooltip="Delete" />
+              <CardButton @click="router.push(`/property-card/${row.supply_id}`)" size="sm" tooltip="View Card" />
+            </div>
+          </template>
 
-              </td>
-
-              <!-- Supply Info -->
-              <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ card.supply_id }}</td>
-              <td class="px-4 py-3 text-sm text-gray-800">{{ card.supply?.StockNo }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.category?.category_desc }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.Supplies_Desc }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.unit?.Unit_Type }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.UnitValue }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ card.balance }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.supplies_nonstock_qty }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ card.supply?.Supplies_ReOrder_PT }}</td>
-            </tr>
-
-            <tr v-if="!loading && propertyCards.length === 0">
-              <td colspan="11" class="p-6 text-center text-gray-400 italic">
-                No property cards found.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Footer: showing items -->
-        <div
-          class="bg-gray-50 px-4 py-2 text-gray-700 text-sm rounded-b-lg border-t border-gray-200 flex justify-between items-center">
-          <span>
-            Showing items <strong>{{ (currentPage - 1) * rowsPerPage + 1 }}</strong> to
-            <strong>{{ Math.min(currentPage * rowsPerPage, totalRecords) }}</strong> of
-            <strong>{{ totalRecords }}</strong> entries
-          </span>
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-4 flex justify-center">
-          <Paginator :totalRecords="totalRecords" :rows="rowsPerPage" :rowsPerPageOptions="[10, 20, 30, 40, 50]"
-            @page="onPageChange" class="shadow rounded-lg" />
-        </div>
+          <!-- Footer -->
+          <template #footer>
+            <div class="relative bg-gray-50 border-t border-gray-200 rounded-b-lg">
+              <div class="absolute left-4 mt-3 -translate-y-1/2 text-gray-700 text-sm">
+                Showing <strong>{{ startItem }}</strong> to <strong>{{ endItem }}</strong> of
+                <strong>{{ total }}</strong> entries
+              </div>
+              <div class="flex justify-center">
+                <Pagination
+                  :total="total"
+                  v-model:perPage="perPage"
+                  v-model:currentPage="currentPage"
+                  :perPageOptions="[10, 20, 30, 50, 100]"
+                />
+              </div>
+            </div>
+          </template>
+        </BaseTable>
       </div>
     </div>
   </AppLayout>

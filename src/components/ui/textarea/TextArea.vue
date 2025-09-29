@@ -22,6 +22,7 @@
 <script setup>
 import { useVModel } from "@vueuse/core";
 import { cn } from "@/lib/utils";
+import { baseInputClass } from "@/lib/inputStyles"
 
 const props = defineProps({
   modelValue: { type: [String, Number], required: false },

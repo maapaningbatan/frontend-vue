@@ -26,6 +26,7 @@ const local = reactive({
   receiving_office: 'AS-PMD/CMD',
   code_number: '',
   purpose: '',
+  prepared_by: '',
   ...props.deliveryData // override defaults with parent data
 })
 
@@ -83,7 +84,7 @@ onMounted(async () => {
 // -----------------------------
 // Convert local reactive to refs for v-model
 // -----------------------------
-const { iar_number, purchase_order_number, purchase_date, pr_number, pr_date, supplier, warehouse, receiving_office, code_number, purpose } = toRefs(local)
+const { iar_number, purchase_order_number, purchase_date, pr_number, pr_date, supplier, warehouse, receiving_office, code_number, purpose, prepared_by } = toRefs(local)
 </script>
 
 <template>
@@ -154,12 +155,17 @@ const { iar_number, purchase_order_number, purchase_date, pr_number, pr_date, su
         <Label>Code Number</Label>
         <Input v-model="code_number" readonly class="mt-1 w-full h-11 bg-gray-100" />
       </div>
+      <div>
+        <Label>Prepared By</Label>
+        <Input v-model="prepared_by"/>
+      </div>
 
       <!-- Purpose -->
       <div class="md:col-span-2">
         <Label>Purpose</Label>
         <TextArea v-model="purpose" :rows="3" placeholder="Purpose" class="mt-1 w-full" />
       </div>
+      
     </form>
   </div>
 </template>

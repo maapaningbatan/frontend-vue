@@ -51,8 +51,9 @@ const loading = ref(false)
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Dashboard', href: '/dashboard' },
+  { title: 'Supply Management', href: '#' },
   { title: 'RIS', href: '/ris' },
-  { title: 'Add RIS', href: '/ris/add' }
+  { title: 'Request RIS', href: '/ris/add' }
 ]
 
 // Stepper definition

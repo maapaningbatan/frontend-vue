@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import AppLayout from '@/components/layouts/AppLayout.vue'
 import { type BreadcrumbItem } from '@/types/api'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import ActionButtons from '@/components/ui/button/ActionButtons.vue'
-import { Check } from 'lucide-vue-next'
+import EditButton from '@/components/ui/button/EditButton.vue'
+import DeleteButton from '@/components/ui/button/DeleteButton.vue'
+import ApproveButton from '@/components/ui/button/ApproveButton.vue'
+import BaseTable from '@/components/ui/table/BaseTable.vue'
+import AddButton from '@/components/ui/button/AddButton.vue'
+import SearchInput from '@/components/ui/search/SearchInput.vue'
+import Pagination from '@/components/ui/pagination/Pagination.vue'
 
 // Router instance
 const router = useRouter()
@@ -13,15 +18,40 @@ const router = useRouter()
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Dashboard', href: '/dashboard' },
+  { title: 'Supply Management', href: '#' },
   { title: 'RIS', href: '/ris' },
 ]
+
+// Table columns
+const columns: {
+  key: string
+  label: string
+  align?: 'left' | 'center' | 'right'
+}[] = [
+  { key: 'actions', label: 'Action', align: 'center' },
+  { key: 'ris_number', label: 'RIS Number' },
+  { key: 'office', label: 'Office' },
+  { key: 'purpose', label: 'Purpose' },
+  { key: 'requested_by', label: 'Requested By' },
+  { key: 'ris_date', label: 'RIS Date' },
+  { key: 'ris_status', label: 'RIS Status', align: 'center' },
+  { key: 'created_at', label: 'Date Created', align: 'center' },
+  { key: 'created_by', label: 'Created By', align: 'center' },
+]
+
+// Search state
+const searchRIS = ref('')
 
 // Reactive state
 const risList = ref<any[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-// Navigate to RISAdd.vue
+// Pagination state
+const currentPage = ref(1)
+const perPage = ref(10)
+
+// Navigate to Add/Edit
 function goToAddRIS() {
   router.push('/ris/add')
 }
@@ -29,7 +59,7 @@ function handleEdit(id: number) {
   router.push(`/ris/edit/${id}`)
 }
 
-// ✅ Format date helper
+// Format date helper
 function formatDate(dateString: string): string {
   if (!dateString) return ''
   const date = new Date(dateString)
@@ -74,7 +104,6 @@ async function approveRIS(id: number) {
 
   try {
     await axios.post(`http://127.0.0.1:8000/api/ris/${id}/approve`)
-    // Refresh list
     await fetchRIS()
     alert('RIS approved successfully!')
   } catch (err) {
@@ -82,19 +111,46 @@ async function approveRIS(id: number) {
     alert('Failed to approve RIS. Check console for details.')
   }
 }
+
+// Filtered RIS list
+const filteredRIS = computed(() => {
+  const term = searchRIS.value.toLowerCase()
+  if (!term) return risList.value
+  return risList.value.filter((r) =>
+    (r.ris_number?.toLowerCase() || '').includes(term) ||
+    (r.office_info?.Office_Desc?.toLowerCase() || '').includes(term) ||
+    (r.purpose?.toLowerCase() || '').includes(term) ||
+    (r.requested_by_employee?.full_name?.toLowerCase() || '').includes(term)
+  )
+})
+
+// Pagination calculations
+const totalRIS = computed(() => filteredRIS.value.length)
+const startItem = computed(() => (currentPage.value - 1) * perPage.value + 1)
+const endItem = computed(() => {
+  const last = currentPage.value * perPage.value
+  return last > totalRIS.value ? totalRIS.value : last
+})
 </script>
 
 <template>
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
       <!-- Top Actions -->
-      <div class="flex justify-end mb-4">
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          @click="goToAddRIS"
-        >
-          + Add RIS
-        </button>
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-center sm:text-left">
+          <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            Requisition and Issue Slip
+          </h1>
+          <p class="text-sm text-gray-500 mt-1">
+            Requisition and Issue Slips - Track requests, approvals, and issued items.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <SearchInput v-model="searchRIS" placeholder="Search" class="w-full sm:w-64" />
+          <AddButton label="Request RIS" @click="goToAddRIS" />
+        </div>
       </div>
 
       <!-- Loading / Error -->
@@ -103,89 +159,85 @@ async function approveRIS(id: number) {
 
       <!-- Table -->
       <div v-else class="overflow-x-auto rounded-lg shadow border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Action</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">RIS Number</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Office</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Purpose</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Requested By</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">RIS Date</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">RIS Status</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Date Created</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Created By</th>
-            </tr>
-          </thead>
+        <BaseTable :items="filteredRIS" :columns="columns" striped>
+          <!-- Actions column -->
+          <template #actions="{ row }">
+            <div class="flex gap-2">
+              <EditButton @click="handleEdit(row.ris_id)" size="sm" tooltip="Edit RIS" />
+              <DeleteButton @delete="deleteRIS(row.ris_id)" size="sm" tooltip="Delete RIS" />
+              <ApproveButton
+                @click="approveRIS(row.ris_id)"
+                :disabled="row.ris_status === 'Approved'"
+                size="sm"
+                tooltip="Approve RIS"
+              />
+            </div>
+          </template>
 
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr
-              v-for="ris in risList"
-              :key="ris.ris_id"
-              class="hover:bg-blue-50 transition"
+          <!-- Office column -->
+          <template #office="{ row }">
+            {{ row.office_info?.Office_Desc || 'N/A' }}
+          </template>
+
+          <!-- Requested By column -->
+          <template #requested_by="{ row }">
+            {{ row.requested_by_employee?.full_name || 'N/A' }}
+          </template>
+
+          <!-- RIS Date -->
+          <template #ris_date="{ row }">
+            {{ formatDate(row.ris_date) }}
+          </template>
+
+          <!-- RIS Status -->
+          <template #ris_status="{ row }">
+             <span
+              class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm transition-all border"
+              :class="
+                row.status === 'Approved'
+                  ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200'
+                  : 'bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200'
+              "
             >
-              <td class="px-4 py-3 text-center flex justify-center gap-2">
-                <!-- Action Buttons -->
-                <ActionButtons
-                  @edit="handleEdit(ris.ris_id)"
-                  @delete="deleteRIS(ris.ris_id)"
+              <span
+                class="w-2 h-2 rounded-full mr-2"
+                :class="row.status === 'Approved' ? 'bg-green-500' : 'bg-yellow-500'"
+              ></span>
+              {{ row.status }}
+            </span>
+          </template>
+
+          <!-- Created At -->
+          <template #created_at="{ row }">
+            {{ formatDate(row.created_at) }}
+          </template>
+
+          <!-- Created By -->
+          <template #created_by="{ row }">
+            {{ row.created_by_employee?.full_name || 'N/A' }}
+          </template>
+
+          <!-- Footer -->
+          <template #footer>
+            <div class="relative bg-gray-50 border-t border-gray-200 rounded-b-lg">
+              <div
+                class="absolute left-4 mt-3 -translate-y-1/2 text-gray-700 text-sm md:text-small"
+              >
+                Showing items <strong>{{ startItem }}</strong> to <strong>{{ endItem }}</strong> of
+                <strong>{{ totalRIS }}</strong> entries
+              </div>
+
+              <div class="flex justify-center">
+                <Pagination
+                  :total="totalRIS"
+                  v-model:perPage="perPage"
+                  v-model:currentPage="currentPage"
+                  :perPageOptions="[10, 20, 30, 50, 100]"
                 />
-
-                <!-- Approve Button -->
-                <button
-                  @click="approveRIS(ris.ris_id)"
-                  :disabled="ris.ris_status === 'Approved'"
-                  class="p-2 rounded-full border flex items-center justify-center transition
-                         hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
-                         border-blue-700 text-blue-500 hover:bg-blue-100"
-                >
-                  <Check class="w-4 h-4" />
-                </button>
-              </td>
-
-              <td class="px-4 py-3 text-sm text-gray-700">{{ ris.ris_number }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ ris.office_info?.Office_Desc || 'N/A' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ ris.purpose }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ ris.requested_by_employee?.full_name || 'N/A' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(ris.ris_date) }}</td>
-              <td class="px-4 py-3 text-sm font-semibold">
-                <span
-                  class="px-2 py-1 rounded text-xs"
-                  :class="ris.ris_status === 'Approved'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'"
-                >
-                  {{ ris.ris_status }}
-                </span>
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(ris.created_at) }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ ris.created_by_employee?.full_name || 'N/A' }}</td>
-            </tr>
-
-            <!-- Empty state -->
-            <tr v-if="!risList.length">
-              <td colspan="9" class="p-6 text-center text-gray-400 italic">
-                No RIS records found.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Footer -->
-        <div
-          class="bg-gray-50 px-4 py-2 text-gray-700 text-sm rounded-b-lg border-t border-gray-200 flex justify-between items-center"
-        >
-          <span>
-            Showing <strong>{{ risList.length }}</strong> entries
-          </span>
-
-          <!-- Static Pagination -->
-          <div class="flex items-center gap-2">
-            <button class="px-3 py-1 border rounded hover:bg-gray-100">&laquo;</button>
-            <button class="px-3 py-1 border rounded bg-blue-500 text-white">1</button>
-            <button class="px-3 py-1 border rounded hover:bg-gray-100">&raquo;</button>
-          </div>
-        </div>
+              </div>
+            </div>
+          </template>
+        </BaseTable>
       </div>
     </div>
   </AppLayout>

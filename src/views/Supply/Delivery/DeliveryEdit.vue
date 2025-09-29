@@ -68,6 +68,7 @@ const models = ref<any[]>([])
 // Breadcrumbs
 const breadcrumbs = [
   { title: 'Dashboard', href: '/dashboard' },
+  { title: 'Supply Management', href: '#' },
   { title: 'Delivery', href: '/delivery' },
   { title: 'Edit Delivery', href: '/delivery/edit' }
 ]
@@ -262,6 +263,7 @@ function goToDeliveryList() {
     models,
     itemTypes
   } : {}"
+  @update:poAmount="deliveryData.po_amount = $event" 
 />
         </div>
       </keep-alive>

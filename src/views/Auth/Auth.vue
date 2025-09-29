@@ -1,10 +1,8 @@
 <template>
-    <div class="min-h-screen flex flex-col">
-
     <transition name="slide-fade" mode="out-in" appear>
       <router-view />
     </transition>
-</div>  
+
 </template>
 
 <script setup>

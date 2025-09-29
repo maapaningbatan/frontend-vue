@@ -1,7 +1,8 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-100 p-6">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-100 p-6"
+  >
     <div class="flex w-full max-w-7xl bg-white shadow-2xl rounded-3xl overflow-hidden">
-
       <!-- LEFT SIDE (Illustration) -->
       <div class="hidden lg:flex w-1/3 items-center justify-center bg-blue-100">
         <img src="/images/image2.png" alt="Illustration" class="w-3/4" />
@@ -9,7 +10,6 @@
 
       <!-- RIGHT SIDE (Form) -->
       <div class="flex flex-col w-full lg:w-2/3 p-8">
-
         <!-- Logo + Title -->
         <div class="flex items-center space-x-4 mb-6">
           <img src="/images/logo.png" alt="Logo" class="w-12 sm:w-14 h-auto" />
@@ -18,55 +18,77 @@
           </h1>
         </div>
 
-
-
-       
         <!-- Register Form (locked until agreement) -->
-        <form 
-          @submit.prevent="register" 
-          class="flex flex-col gap-4 mt-6 relative z-0"
-        >
+        <form @submit.prevent="register" class="flex flex-col gap-4 mt-6 relative z-0">
           <!-- USER INFO GRID -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-1">Username <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium mb-1"
+                >Username <span class="text-red-500">*</span></label
+              >
               <Input v-model="form.username" type="text" placeholder="Username" class="input" />
               <p v-if="errors.username" class="text-red-500 text-sm mt-1">{{ errors.username }}</p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1">Email <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium mb-1"
+                >Email <span class="text-red-500">*</span></label
+              >
               <Input v-model="form.email" type="email" placeholder="Email" class="input" />
               <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1">Password <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium mb-1"
+                >Password <span class="text-red-500">*</span></label
+              >
               <Input v-model="form.password" type="password" placeholder="Password" class="input" />
               <p v-if="errors.password" class="text-red-500 text-sm mt-1">{{ errors.password }}</p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1">Confirm Password <span class="text-red-500">*</span></label>
-              <Input v-model="form.password_confirmation" type="password" placeholder="Confirm Password" class="input" />
-              <p v-if="errors.password_confirmation" class="text-red-500 text-sm mt-1">{{ errors.password_confirmation }}</p>
+              <label class="block text-sm font-medium mb-1"
+                >Confirm Password <span class="text-red-500">*</span></label
+              >
+              <Input
+                v-model="form.password_confirmation"
+                type="password"
+                placeholder="Confirm Password"
+                class="input"
+              />
+              <p v-if="errors.password_confirmation" class="text-red-500 text-sm mt-1">
+                {{ errors.password_confirmation }}
+              </p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1">First Name <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium mb-1"
+                >First Name <span class="text-red-500">*</span></label
+              >
               <Input v-model="form.first_name" type="text" placeholder="First Name" class="input" />
-              <p v-if="errors.first_name" class="text-red-500 text-sm mt-1">{{ errors.first_name }}</p>
+              <p v-if="errors.first_name" class="text-red-500 text-sm mt-1">
+                {{ errors.first_name }}
+              </p>
             </div>
 
             <div>
               <label class="block text-sm font-medium mb-1">Middle Name</label>
-              <Input v-model="form.middle_name" type="text" placeholder="Middle Name" class="input" />
+              <Input
+                v-model="form.middle_name"
+                type="text"
+                placeholder="Middle Name"
+                class="input"
+              />
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1">Last Name <span class="text-red-500">*</span></label>
+              <label class="block text-sm font-medium mb-1"
+                >Last Name <span class="text-red-500">*</span></label
+              >
               <Input v-model="form.last_name" type="text" placeholder="Last Name" class="input" />
-              <p v-if="errors.last_name" class="text-red-500 text-sm mt-1">{{ errors.last_name }}</p>
+              <p v-if="errors.last_name" class="text-red-500 text-sm mt-1">
+                {{ errors.last_name }}
+              </p>
             </div>
 
             <div>
@@ -75,24 +97,44 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1">Position <span class="text-red-500">*</span></label>
-              <SelectSearch v-model="form.position_id" :options="positions.map(p => ({ value: p.id, label: p.position_desc }))" placeholder="Select Position" class="input" />
-              <p v-if="errors.position_id" class="text-red-500 text-sm mt-1">{{ errors.position_id }}</p>
+              <label class="block text-sm font-medium mb-1"
+                >Position <span class="text-red-500">*</span></label
+              >
+              <SelectSearch
+                v-model="form.position_id"
+                :options="positions.map((p) => ({ value: p.id, label: p.position_desc }))"
+                placeholder="Select Position"
+                class="input"
+              />
+              <p v-if="errors.position_id" class="text-red-500 text-sm mt-1">
+                {{ errors.position_id }}
+              </p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1">Region <span class="text-red-500">*</span></label>
-              <SelectSearch v-model="form.region_id" :options="regions.map(r => ({ value: r.id, label: r.region_code }))" placeholder="Select Region" class="input" />
-              <p v-if="errors.region_id" class="text-red-500 text-sm mt-1">{{ errors.region_id }}</p>
+              <label class="block text-sm font-medium mb-1"
+                >Region <span class="text-red-500">*</span></label
+              >
+              <SelectSearch
+                v-model="form.region_id"
+                :options="regions.map((r) => ({ value: r.id, label: r.region_code }))"
+                placeholder="Select Region"
+                class="input"
+              />
+              <p v-if="errors.region_id" class="text-red-500 text-sm mt-1">
+                {{ errors.region_id }}
+              </p>
             </div>
           </div>
 
           <!-- Office -->
           <div class="mt-4">
-            <label class="block text-sm font-medium mb-1">Office <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium mb-1"
+              >Office <span class="text-red-500">*</span></label
+            >
             <SelectSearch
               v-model="form.office_id"
-              :options="offices.map(o => ({ value: o.id, label: o.office_desc }))"
+              :options="offices.map((o) => ({ value: o.id, label: o.office_desc }))"
               placeholder="Select Office"
               class="input"
               :disabled="!form.region_id"
@@ -102,81 +144,93 @@
 
           <!-- Division -->
           <div class="mt-4">
-            <label class="block text-sm font-medium mb-1">Division <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium mb-1"
+              >Division <span class="text-red-500">*</span></label
+            >
             <SelectSearch
               v-model="form.division_id"
-              :options="divisions.length ? divisions.map(d => ({ value: d.id, label: d.division_desc })) : []"
+              :options="
+                divisions.length
+                  ? divisions.map((d) => ({ value: d.id, label: d.division_desc }))
+                  : []
+              "
               placeholder="Select a division"
               class="input"
               :disabled="!form.office_id || divisions.length === 0"
             />
-            <p v-if="errors.division_id" class="text-red-500 text-sm mt-1">{{ errors.division_id }}</p>
+            <p v-if="errors.division_id" class="text-red-500 text-sm mt-1">
+              {{ errors.division_id }}
+            </p>
           </div>
 
-          <button type="submit" class="mt-4 px-6 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-700 text-white">
+          <button
+            type="submit"
+            class="mt-4 px-6 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-700 text-white"
+          >
             Register
           </button>
- <p class="text-center mt-6">
-  Already have an account?
-  <router-link to="/auth/login" class="text-cyan-600 font-semibold hover:underline">
-    Return to Login Page
-  </router-link>
-</p>
+          <p class="text-center mt-6">
+            Already have an account?
+            <router-link to="/auth/login" class="text-cyan-600 font-semibold hover:underline">
+              Return to Login Page
+            </router-link>
+          </p>
           <p v-if="successMessage" class="text-green-600 text-center mt-2">{{ successMessage }}</p>
           <p v-if="errorMessage" class="text-red-600 text-center mt-2">{{ errorMessage }}</p>
         </form>
 
-
         <!-- Modal -->
-<transition name="fade">
-  <div
-    v-if="showAgreementModal"
-    class="absolute inset-0 flex items-center justify-center z-50"
-  >
-    <!-- Blurred background -->
-    <div class="absolute inset-0 backdrop-blur-sm bg-white/30"></div>
+        <transition name="fade">
+          <div
+            v-if="showAgreementModal"
+            class="absolute inset-0 flex items-center justify-center z-50"
+          >
+            <!-- Blurred background -->
+            <div class="absolute inset-0 backdrop-blur-sm bg-white/30"></div>
 
-    <!-- Modal content -->
-    <div class="bg-white p-6 rounded-xl w-full max-w-md relative z-10 shadow-lg">
-      <h2 class="text-lg font-bold mb-4">Data Privacy Agreement</h2>
-      <p class="text-sm mb-4">
-DATA PRIVACY STATEMENT
-By accomplishing this attendance form, you consent to the collection and use of the following personal information: 
-Full name, office, position, sex, email address, contact number; and
-The date and time when the participants submitted the form.
-Your personal data will be kept confidential and will only be accessed by authorized personnel of the Administrative Service's Knowledge Management Team (Focal, Alternate Focal, Team Members from AS divisions) to ensure the protection of the client's personal data. It will not be shared with third parties without your consent, except as required by law.
-
-By submitting this form, you acknowledge and agree to the terms outlined in this consent notice.      </p>
-      <div class="flex items-center mb-4">
-        <input type="checkbox" id="agree" v-model="agreed" class="mr-2" />
-        <label for="agree" class="text-sm">
-          I have read and agree to the Data Privacy Act
-        </label>
-      </div>
-      <div class="flex justify-end">
-        <!-- Cancel button now redirects to login -->
-        <button 
-          @click="router.push('/auth/login')" 
-          class="mr-2 px-4 py-2 bg-gray-200 rounded"
-        >
-          Cancel
-        </button>
-        <!-- OK button unlocks form -->
-        <button
-          @click="unlockForm"
-          :disabled="!agreed"
-          class="px-4 py-2 bg-cyan-600 text-white rounded disabled:opacity-50"
-        >
-          OK
-        </button>
+            <!-- Modal content -->
+            <div class="bg-white p-6 rounded-xl w-full max-w-md relative z-10 shadow-lg">
+              <h2 class="text-lg font-bold mb-4">Data Privacy Agreement</h2>
+              <p class="text-sm mb-4">
+                DATA PRIVACY STATEMENT By accomplishing this attendance form, you consent to the
+                collection and use of the following personal information: Full name, office,
+                position, sex, email address, contact number; and The date and time when the
+                participants submitted the form. Your personal data will be kept confidential and
+                will only be accessed by authorized personnel of the Administrative Service's
+                Knowledge Management Team (Focal, Alternate Focal, Team Members from AS divisions)
+                to ensure the protection of the client's personal data. It will not be shared with
+                third parties without your consent, except as required by law. By submitting this
+                form, you acknowledge and agree to the terms outlined in this consent notice.
+              </p>
+              <div class="flex items-center mb-4">
+                <input type="checkbox" id="agree" v-model="agreed" class="mr-2" />
+                <label for="agree" class="text-sm">
+                  I have read and agree to the Data Privacy Act
+                </label>
+              </div>
+              <div class="flex justify-end">
+                <!-- Cancel button now redirects to login -->
+                <button
+                  @click="router.push('/auth/login')"
+                  class="mr-2 px-4 py-2 bg-gray-200 rounded"
+                >
+                  Cancel
+                </button>
+                <!-- OK button unlocks form -->
+                <button
+                  @click="unlockForm"
+                  :disabled="!agreed"
+                  class="px-4 py-2 bg-cyan-600 text-white rounded disabled:opacity-50"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </transition>
       </div>
     </div>
   </div>
-</transition>
-      </div>
-    </div>
-  </div>
-
 </template>
 
 <script setup>
@@ -217,14 +271,10 @@ const errors = reactive({})
 const showAgreementModal = ref(false)
 const agreed = ref(false)
 
-
 // Fetch positions and regions
 onMounted(async () => {
   try {
-    const [posRes, regRes] = await Promise.all([
-      axios.get('/positions'),
-      axios.get('/regions'),
-    ])
+    const [posRes, regRes] = await Promise.all([axios.get('/positions'), axios.get('/regions')])
     positions.value = posRes.data
     regions.value = regRes.data
   } catch (err) {
@@ -233,33 +283,39 @@ onMounted(async () => {
 })
 
 // Watch region → fetch offices
-watch(() => form.region_id, async (regionId) => {
-  offices.value = []
-  divisions.value = []
-  form.office_id = null
-  form.division_id = null
+watch(
+  () => form.region_id,
+  async (regionId) => {
+    offices.value = []
+    divisions.value = []
+    form.office_id = null
+    form.division_id = null
 
-  if (!regionId) return
-  try {
-    const res = await axios.get(`/offices/region/${regionId}`)
-    offices.value = res.data
-  } catch (err) {
-    console.error(err)
-  }
-})
+    if (!regionId) return
+    try {
+      const res = await axios.get(`/offices/region/${regionId}`)
+      offices.value = res.data
+    } catch (err) {
+      console.error(err)
+    }
+  },
+)
 
 // Watch office → fetch divisions
-watch(() => form.office_id, async (officeId) => {
-  form.division_id = null
-  divisions.value = []
-  if (!officeId) return
-  try {
-    const res = await axios.get(`/divisions/office/${officeId}`)
-    divisions.value = res.data || []
-  } catch (err) {
-    console.error(err)
-  }
-})
+watch(
+  () => form.office_id,
+  async (officeId) => {
+    form.division_id = null
+    divisions.value = []
+    if (!officeId) return
+    try {
+      const res = await axios.get(`/divisions/office/${officeId}`)
+      divisions.value = res.data || []
+    } catch (err) {
+      console.error(err)
+    }
+  },
+)
 
 onMounted(() => {
   // Show modal automatically when entering register.vue
@@ -273,7 +329,7 @@ function unlockForm() {
 
 // Validation
 function validateForm() {
-  Object.keys(errors).forEach(k => delete errors[k])
+  Object.keys(errors).forEach((k) => delete errors[k])
   if (!form.username) errors.username = 'Please enter username'
   if (!form.email) errors.email = 'Please enter email address'
   if (!form.password) errors.password = 'Please enter password'

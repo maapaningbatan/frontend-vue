@@ -5,7 +5,9 @@ import SelectSearch from '@/components/ui/select/SelectSearch.vue'
 import TextArea from '@/components/ui/textarea/TextArea.vue'
 import Input from '@/components/ui/input/Input.vue'
 import { Label } from 'reka-ui'
+import { useNotificationStore } from '@/stores/notification'
 
+const notificationStore = useNotificationStore()
 
 interface Supply {
   SuppliesID: number
@@ -45,7 +47,7 @@ interface Model {
 
 // State
 const itemTypes = ref<ItemType[]>([])
-const quantity = ref<number>(0)
+const quantity = ref<number>(1)
 const supplies = ref<Supply[]>([])
 const units = ref<Unit[]>([])
 const categories = ref<Category[]>([])
@@ -89,8 +91,7 @@ onMounted(async () => {
       axios.get('http://localhost:8000/api/categories'),
       axios.get('http://localhost:8000/api/brands'),
       axios.get('http://localhost:8000/api/models'),
-      axios.get('http://localhost:8000/api/itemtypes') // 👈 fetch item types
-
+      axios.get('http://localhost:8000/api/itemtypes')
     ])
 
     supplies.value = Array.isArray(suppliesRes.data)
@@ -107,14 +108,14 @@ onMounted(async () => {
     categories.value = Array.isArray(categoriesRes.data) ? categoriesRes.data : []
     brands.value = Array.isArray(brandsRes.data) ? brandsRes.data : []
     models.value = Array.isArray(modelsRes.data) ? modelsRes.data : []
-    itemTypes.value = Array.isArray(itemTypesRes.data) ? itemTypesRes.data : [] // 👈 set item types
+    itemTypes.value = Array.isArray(itemTypesRes.data) ? itemTypesRes.data : []
 
   } catch (error) {
     console.error('Error fetching data:', error)
   }
 })
 
-// Watch
+// Watchers
 watch(selectedSupply, (newVal) => {
   if (!newVal) {
     selectedUnit.value = undefined
@@ -130,7 +131,14 @@ watch(selectedSupply, (newVal) => {
   }
 })
 
-const errorMessage = ref('') // <-- add this
+// Ensure quantity is always >= 1
+watch(quantity, (newVal) => {
+  if (!newVal || newVal < 1) {
+    quantity.value = 1
+  }
+})
+
+const errorMessage = ref('')
 
 // Props & emits
 const props = defineProps<{ items: any[] }>()
@@ -140,13 +148,22 @@ const emit = defineEmits(['update:items'])
 function addItem() {
   if (!selectedSupply.value) {
     errorMessage.value = 'Please select a supply.'
+    notificationStore.show(
+      'error',
+      'Missing Supply',
+      'Please select a supply before adding.'
+    )
     return
   }
 
-  // Check for duplicates
   const duplicate = props.items.find(item => item.supply === selectedSupply.value)
   if (duplicate) {
     errorMessage.value = `The supply "${duplicate.stock_number}" is already added.`
+    notificationStore.show(
+      'error',
+      'Duplicate Item',
+      `The supply "${duplicate.stock_number}" is already in the list.`
+    )
     return
   }
 
@@ -171,6 +188,13 @@ function addItem() {
 
   emit('update:items', [...props.items, newItem])
 
+  // ✅ Success notification
+  notificationStore.show(
+    'success',
+    'Item Added',
+    `${supply?.Supplies_Desc || 'Supply'} has been added successfully.`
+  )
+
   // Reset fields
   selectedItemType.value = undefined
   selectedSupply.value = undefined
@@ -179,12 +203,14 @@ function addItem() {
   selectedBrand.value = undefined
   selectedModel.value = undefined
   unitCost.value = 0
-  quantity.value = 0
+  quantity.value = 1
   additional_description.value = ''
   remarks.value = ''
   filterStatus.value = 0
-  errorMessage.value = '' // clear error
+  errorMessage.value = ''
 }
+
+
 </script>
 
 <template>
@@ -197,46 +223,41 @@ function addItem() {
     leave-to-class="opacity-0 translate-y-2"
   >
     <div>
-      <div v-if="errorMessage" class="mb-2 text-red-600 font-medium">
-  {{ errorMessage }}
-</div>
       <h3 class="text-xl font-bold mb-4">Items Details</h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <!-- Item Type -->
-<div>
-  <Label class="block text-sm font-medium text-gray-700">Item Type</Label>
-  <SelectSearch
-    v-model="selectedItemType"
-    :options="itemTypes.map(it => ({ label: it.itemtype_name, value: it.itemtype_id }))"
-    placeholder="Select Item Type"
-    class="mt-1 w-full h-11"
-  />
-</div>
+        <div>
+          <Label class="block text-sm font-medium text-gray-700">Item Type</Label>
+          <SelectSearch
+            v-model="selectedItemType"
+            :options="itemTypes.map(it => ({ label: it.itemtype_name, value: it.itemtype_id }))"
+            placeholder="Select Item Type"
+            class="mt-1 w-full h-11"
+          />
+        </div>
 
-        <!-- Supplies Section -->
-<div>
-  <div class="flex items-center justify-start space-x-4 mb-2">
-    <Label class="text-sm font-medium">Supplies</Label>
-    <label class="inline-flex items-center space-x-1">
-      <input type="radio" :value="0" v-model.number="filterStatus" class="form-radio text-blue-600" />
-      <span class="text-sm">Active Only</span>
-    </label>
-    <label class="inline-flex items-center space-x-1">
-      <input type="radio" :value="1" v-model.number="filterStatus" class="form-radio text-blue-600" />
-      <span class="text-sm">Inactive Only</span>
-    </label>
-  </div>
+        <!-- Supplies -->
+        <div>
+          <div class="flex items-center justify-start space-x-4 mb-2">
+            <Label class="text-sm font-medium">Supplies</Label>
+            <label class="inline-flex items-center space-x-1">
+              <input type="radio" :value="0" v-model.number="filterStatus" class="form-radio text-blue-600" />
+              <span class="text-sm">Active Only</span>
+            </label>
+            <label class="inline-flex items-center space-x-1">
+              <input type="radio" :value="1" v-model.number="filterStatus" class="form-radio text-blue-600" />
+              <span class="text-sm">Inactive Only</span>
+            </label>
+          </div>
 
-  <!-- Supplies Dropdown -->
-  <SelectSearch
-    v-model="selectedSupply"
-    :options="filteredSupplies.map(s => ({ label: `${s.Supplies_Desc} / ${s.StockNo}`, value: s.SuppliesID }))"
-    placeholder="Select Supply"
-    class="w-full h-11"
-  />
-</div>
-
+          <SelectSearch
+            v-model="selectedSupply"
+            :options="filteredSupplies.map(s => ({ label: `${s.Supplies_Desc} / ${s.StockNo}`, value: s.SuppliesID }))"
+            placeholder="Select Supply"
+            class="w-full h-11"
+          />
+        </div>
 
         <!-- Stock Number -->
         <div>
@@ -246,7 +267,6 @@ function addItem() {
             placeholder="Enter Stock Number"
             readonly
             :value="selectedSupplyStockNo"
-            class="mt-1 p-2 bg-gray-100 rounded-sm w-full h-9 border-gray-300 text-sm"
           />
         </div>
 
@@ -275,12 +295,12 @@ function addItem() {
         <!-- Unit Cost -->
         <div>
           <Label for="unit_value" class="block text-sm font-medium">Unit Cost</Label>
-          <input
+          <Input
             type="number"
             id="unit_value"
             name="unit_value"
             v-model.number="unitCost"
-            class="mt-1 p-2 bg-gray-100 rounded-sm dark:bg-gray-800 dark:text-white w-full h-9 border-gray-300 text-sm"
+            min="1"
           />
         </div>
 
@@ -290,6 +310,7 @@ function addItem() {
           <Input
             v-model.number="quantity"
             type="number"
+            min="1"
             placeholder="Enter Quantity"
             class="mt-1 block w-full border rounded-lg px-3 py-2"
           />
@@ -302,7 +323,7 @@ function addItem() {
             type="number"
             readonly
             :value="total_amountAmount"
-            class="mt-1 p-2 bg-gray-100 rounded-sm dark:bg-gray-800 dark:text-white w-full h-9 border-gray-300 text-sm"
+            placeholder="0.00"
           />
         </div>
 
@@ -337,7 +358,6 @@ function addItem() {
             v-model="additional_description"
             placeholder="Additional Description"
             :rows="3"
-            class="mt-1 w-full border border-gray-300 rounded-lg bg-gray-50 shadow-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-500 text-sm text-gray-700 dark:bg-gray-900 dark:text-white"
           />
         </div>
 
@@ -347,7 +367,6 @@ function addItem() {
             v-model="remarks"
             placeholder="Remarks"
             :rows="3"
-            class="mt-1 w-full border border-gray-300 rounded-lg bg-gray-50 shadow-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-500 text-sm text-gray-700 dark:bg-gray-900 dark:text-white"
           />
         </div>
 

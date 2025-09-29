@@ -3,8 +3,9 @@ import { ref, computed, reactive, watch } from 'vue'
 import Input from '@/components/ui/input/Input.vue'
 import TextArea from '@/components/ui/textarea/TextArea.vue'
 import SelectSearch from '@/components/ui/select/SelectSearch.vue'
-import ActionButtons from '@/components/ui/button/ActionButtons.vue'
 import { Label } from 'reka-ui'
+import EditButton from '@/components/ui/button/EditButton.vue'
+import DeleteButton from '@/components/ui/button/DeleteButton.vue'
 
 interface ItemType {
   itemtype_id: number
@@ -22,7 +23,9 @@ const props = defineProps<{
   itemTypes?: ItemType[]
 }>()
 
-const emit = defineEmits(['update:items'])
+const emit = defineEmits(['update:items', 'update:poAmount'])
+
+
 
 // Modal state
 const isModalOpen = ref(false)
@@ -50,27 +53,29 @@ const localItems = ref([...props.items])
 
 // Options
 const suppliesOptions = computed(
-  () => props.supplies?.map((s) => ({ label: s.Supplies_Desc, value: s.SuppliesID })) || []
+  () => props.supplies?.map((s) => ({ label: s.Supplies_Desc, value: s.SuppliesID })) || [],
 )
 const unitsOptions = computed(
-  () => props.units?.map((u) => ({ label: u.Unit_Type, value: u.Unit_Id })) || []
+  () => props.units?.map((u) => ({ label: u.Unit_Type, value: u.Unit_Id })) || [],
 )
 const categoriesOptions = computed(
-  () => props.categories?.map((c) => ({ label: c.category_desc, value: c.category_id })) || []
+  () => props.categories?.map((c) => ({ label: c.category_desc, value: c.category_id })) || [],
 )
 const brandsOptions = computed(
-  () => props.brands?.map((b) => ({ label: b.Brand_Description, value: b.Brand_Id })) || []
+  () => props.brands?.map((b) => ({ label: b.Brand_Description, value: b.Brand_Id })) || [],
 )
 const modelsOptions = computed(
-  () => props.models?.map((m) => ({ label: m.model_desc, value: m.model_id })) || []
+  () => props.models?.map((m) => ({ label: m.model_desc, value: m.model_id })) || [],
 )
 const itemTypeOptions = computed(
-  () => props.itemTypes?.map((t) => ({ label: t.itemtype_name, value: t.itemtype_id })) || []
+  () => props.itemTypes?.map((t) => ({ label: t.itemtype_name, value: t.itemtype_id })) || [],
 )
 
 // Computed grand total
 const grandTotal = computed(() =>
-  localItems.value.reduce((sum, item) => sum + (item.quantity || 0) * (item.unit_value || 0), 0).toFixed(2)
+  localItems.value
+    .reduce((sum, item) => sum + (item.quantity || 0) * (item.unit_value || 0), 0)
+    .toFixed(2),
 )
 
 // Computed total for editing modal
@@ -119,7 +124,7 @@ function saveItem() {
 
   // ❌ Duplicate check (only for add mode)
   if (modalMode.value === 'add') {
-    const duplicate = localItems.value.find(item => item.supply === normalizedItem.supply)
+    const duplicate = localItems.value.find((item) => item.supply === normalizedItem.supply)
     if (duplicate) {
       errorMessage.value = `The supply "${duplicate.stock_number}" is already added.`
       return // stop saving
@@ -159,7 +164,7 @@ watch(
       editingItem.category = null
       editingItem.unit_value = 0
     }
-  }
+  },
 )
 
 // Sync props.items -> localItems
@@ -167,7 +172,7 @@ watch(
   () => props.items,
   (newVal) => {
     localItems.value = [...newVal]
-  }
+  },
 )
 
 // Helper to get item type name
@@ -175,13 +180,21 @@ function getItemTypeName(id: number) {
   const match = props.itemTypes?.find((t) => Number(t.itemtype_id) === Number(id))
   return match ? match.itemtype_name : 'N/A'
 }
+watch(grandTotal, (val) => {
+  emit('update:poAmount', Number(val)) // parent gets latest grand total
+})
+
 </script>
 
 <template>
   <div>
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Review Delivery Items</h2>
-      <button @click="addItem" type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+      <button
+        @click="addItem"
+        type="button"
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
         + Add Item
       </button>
     </div>
@@ -206,14 +219,27 @@ function getItemTypeName(id: number) {
         <tbody>
           <tr v-for="(item, index) in localItems" :key="index" class="border-t hover:bg-gray-50">
             <td class="px-3 py-2">
-              <ActionButtons @edit="editItem(index)" @delete="removeItem(index)" />
+              <EditButton @click="editItem(index)" size="sm" tooltip="Edit" class="mr-2" />
+              <DeleteButton @click="removeItem(index)" size="sm" tooltip="Delete" />
             </td>
-            <td>{{ props.supplies?.find((s) => s.SuppliesID === item.supply)?.Supplies_Desc || 'N/A' }}</td>
+
+            <td>
+              {{
+                props.supplies?.find((s) => s.SuppliesID === item.supply)?.Supplies_Desc || 'N/A'
+              }}
+            </td>
             <td>{{ getItemTypeName(item.item_type) }}</td>
             <td>{{ item.stock_number }}</td>
             <td>{{ props.units?.find((u) => u.Unit_Id === item.unit)?.Unit_Type || 'N/A' }}</td>
-            <td>{{ props.categories?.find((c) => c.category_id === item.category)?.category_desc || 'N/A' }}</td>
-            <td>{{ props.brands?.find((b) => b.Brand_Id === item.brand)?.Brand_Description || 'N/A' }}</td>
+            <td>
+              {{
+                props.categories?.find((c) => c.category_id === item.category)?.category_desc ||
+                'N/A'
+              }}
+            </td>
+            <td>
+              {{ props.brands?.find((b) => b.Brand_Id === item.brand)?.Brand_Description || 'N/A' }}
+            </td>
             <td>{{ props.models?.find((m) => m.model_id === item.model)?.model_desc || 'N/A' }}</td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.unit_value }}</td>
@@ -230,21 +256,34 @@ function getItemTypeName(id: number) {
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="isModalOpen" class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/10">
+    <div
+      v-if="isModalOpen"
+      class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/10"
+    >
       <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 p-6 relative">
-        <h3 class="text-lg font-bold mb-4">{{ modalMode === 'edit' ? 'Edit Item' : 'Add Item' }}</h3>
-<div v-if="errorMessage" class="mb-2 text-red-600 font-medium">
-  {{ errorMessage }}
-</div>
+        <h3 class="text-lg font-bold mb-4">
+          {{ modalMode === 'edit' ? 'Edit Item' : 'Add Item' }}
+        </h3>
+        <div v-if="errorMessage" class="mb-2 text-red-600 font-medium">
+          {{ errorMessage }}
+        </div>
         <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Supplies</Label>
-            <SelectSearch v-model="editingItem.supply" :options="suppliesOptions" placeholder="Select Supplies" />
+            <SelectSearch
+              v-model="editingItem.supply"
+              :options="suppliesOptions"
+              placeholder="Select Supplies"
+            />
           </div>
 
           <div>
             <Label>Item Type</Label>
-            <SelectSearch v-model="editingItem.item_type" :options="itemTypeOptions" placeholder="Select Item Type" />
+            <SelectSearch
+              v-model="editingItem.item_type"
+              :options="itemTypeOptions"
+              placeholder="Select Item Type"
+            />
           </div>
 
           <div>
@@ -299,8 +338,12 @@ function getItemTypeName(id: number) {
         </form>
 
         <div class="flex justify-end gap-2 mt-4">
-          <button @click="isModalOpen = false" type="button" class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
-          <button @click="saveItem" type="button" class="px-4 py-2 bg-green-600 text-white rounded">Save</button>
+          <button @click="isModalOpen = false" type="button" class="px-4 py-2 bg-gray-200 rounded">
+            Cancel
+          </button>
+          <button @click="saveItem" type="button" class="px-4 py-2 bg-green-600 text-white rounded">
+            Save
+          </button>
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ withDefaults(
   >
     <div class="flex items-center gap-3">
       <SidebarTrigger
-        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        class="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shadow-2xs"
       />
       <template v-if="breadcrumbs && breadcrumbs.length > 0">
         <Breadcrumbs :breadcrumbs="breadcrumbs" />

@@ -16,7 +16,7 @@ const mainNavItems: NavItem[] = [
     icon: MonitorSmartphone,
     items: [
       { title: 'Property Record', href: '/library/position' },
-      { title: 'ICS Record', href: '/library/office' },
+      { title: 'ICS Record', href: '/ics-record' },
       { title: 'Acquisition Mode', href: '/library/user-account' },
       {title: 'Property Issuance', href: '/property-issuance' },
       {title: 'Property Card', href: '/property-card' },
@@ -103,7 +103,7 @@ const mainNavItems: NavItem[] = [
       { title: 'User Account', href: '/library/user-account' }
     ]
   },
-  {
+   {
     title: 'Access Control',
     href: '#',
     icon: FileX,

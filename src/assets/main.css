@@ -168,3 +168,9 @@
     @apply bg-background text-foreground;
   }
 }
+:root {
+  --primary-color: #1e3a8a;        /* Dark Blue */
+  --primary-color-text: #ffffff;   /* White */
+  --primary-color-hover: #1e40af;  /* Slightly lighter dark blue */
+}
+

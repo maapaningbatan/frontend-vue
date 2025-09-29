@@ -1,36 +1,103 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AppLayout from '@/components/layouts/AppLayout.vue'
 import { type BreadcrumbItem } from '@/types/api'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import ActionButtons from '@/components/ui/button/ActionButtons.vue'
-import { Check } from 'lucide-vue-next'
 import Loading from '@/components/loading/Loading.vue'
+import { useNotificationStore } from '@/stores/notification'
+import { useConfirmDialog } from '@/composables/useConfirmDialog'
+import Pagination from '@/components/ui/pagination/Pagination.vue'
+import AddButton from '@/components/ui/button/AddButton.vue'
+import BaseTable from '@/components/ui/table/BaseTable.vue'
+import EditButton from '@/components/ui/button/EditButton.vue'
+import DeleteButton from '@/components/ui/button/DeleteButton.vue'
+import ApproveButton from '@/components/ui/button/ApproveButton.vue'
+import SearchInput from '@/components/ui/search/SearchInput.vue'
 
 // Router instance
 const router = useRouter()
 
+// Notification + confirm
+const notificationStore = useNotificationStore()
+const confirmDialog = useConfirmDialog()
+const searchQuery = ref('')
+
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Dashboard', href: '/dashboard' },
+  { title: 'Supply Management', href: '#' },
   { title: 'Delivery', href: '/delivery' },
 ]
 
-// Reactive state
+// Data
 const deliveries = ref<any[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-// Navigate to DeliveryAdd.vue
+// Pagination state
+const currentPage = ref(1)
+const perPage = ref(10)
+
+// Table columns
+const columns: { key: string; label: string; align?: 'center' | 'left' | 'right' }[] = [
+  { key: 'actions', label: 'Action', align: 'center' },
+  { key: 'delivery_id', label: 'Delivery ID', align: 'left' },
+  { key: 'purchase_order_number', label: 'Purchase Order', align: 'left' },
+  { key: 'iar_number', label: 'IAR Number', align: 'left' },
+  { key: 'purchase_date', label: 'Purchase Date', align: 'left' },
+  { key: 'supplier', label: 'Supplier', align: 'left' },
+  { key: 'po_amount', label: 'Amount', align: 'left' },
+  { key: 'code_number', label: 'Code Number', align: 'left' },
+  { key: 'created_at', label: 'Date Created', align: 'center' },
+  { key: 'status', label: 'Status', align: 'center' },
+]
+
+// Filter deliveries with search (including nested fields)
+const filteredDeliveries = computed(() => {
+  if (!searchQuery.value) return deliveries.value
+  const query = searchQuery.value.toLowerCase()
+  return deliveries.value.filter((d) => {
+    const values = [
+      d.delivery_id,
+      d.purchase_order_number,
+      d.iar_number,
+      d.purchase_date,
+      d.po_amount,
+      d.code_number,
+      d.status,
+      d.supplier_info?.Supplier_Name,
+    ]
+    return values.some((val) => val && String(val).toLowerCase().includes(query))
+  })
+})
+
+// Paginated deliveries
+const paginatedDeliveries = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value
+  const end = start + perPage.value
+  return filteredDeliveries.value.slice(start, end)
+})
+
+const startItem = computed(() => {
+  return total.value === 0 ? 0 : (currentPage.value - 1) * perPage.value + 1
+})
+
+const endItem = computed(() => {
+  const end = currentPage.value * perPage.value
+  return end > total.value ? total.value : end
+})
+
+// Total records for pagination
+const total = computed(() => filteredDeliveries.value.length)
+
+// Helpers
 function goToAddDelivery() {
   router.push('/delivery/add')
 }
 function handleEdit(id: number) {
   router.push(`/delivery/edit/${id}`)
 }
-
-// ✅ Format date helper
 function formatDate(dateString: string): string {
   if (!dateString) return ''
   const date = new Date(dateString)
@@ -53,34 +120,51 @@ async function fetchDeliveries() {
     loading.value = false
   }
 }
-
 onMounted(fetchDeliveries)
 
-// Delete delivery
+// Delete
 async function deleteDelivery(id: number) {
-  if (!confirm('Are you sure you want to delete this delivery?')) return
-
+  const confirmed = await confirmDialog.open({
+    title: 'Delete Delivery',
+    message: `Are you sure you want to delete delivery #${id}?`,
+    type: 'danger',
+    confirmText: 'Delete',
+  })
+  if (!confirmed) return
   try {
-    await axios.delete(`http://localhost:8000/api/delivery/${id}`)
+    await axios.delete(`http://127.0.0.1:8000/api/delivery/${id}`)
     deliveries.value = deliveries.value.filter((d) => d.delivery_id !== id)
+    notificationStore.show(
+      'success',
+      'Delivery Deleted',
+      `Delivery #${id} has been deleted successfully.`,
+    )
   } catch (err) {
     console.error('Failed to delete delivery:', err)
-    alert('Failed to delete delivery. Check console for details.')
+    notificationStore.show('error', 'Delete Failed', `Unable to delete delivery #${id}.`)
   }
 }
 
-// Approve delivery
+// Approve
 async function approveDelivery(id: number) {
-  if (!confirm('Approve this delivery? Once approved, it will be locked.')) return
-
+  const confirmed = await confirmDialog.open({
+    title: 'Approve Delivery',
+    message: `Do you want to approve delivery #${id}? Once approved, it will be locked.`,
+    type: 'info',
+    confirmText: 'Approve',
+  })
+  if (!confirmed) return
   try {
     await axios.post(`http://127.0.0.1:8000/api/delivery/${id}/approve`)
-    // Refresh list
     await fetchDeliveries()
-    alert('Delivery approved successfully!')
+    notificationStore.show(
+      'success',
+      'Delivery Approved',
+      `Delivery #${id} has been approved successfully.`,
+    )
   } catch (err) {
     console.error('Failed to approve delivery:', err)
-    alert('Failed to approve delivery. Check console for details.')
+    notificationStore.show('error', 'Approval Failed', `Unable to approve delivery #${id}.`)
   }
 }
 </script>
@@ -88,109 +172,81 @@ async function approveDelivery(id: number) {
 <template>
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-      <!-- Top Actions -->
-      <div class="flex justify-end mb-4">
-        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" @click="goToAddDelivery">
-          + Add Delivery
-        </button>
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-center sm:text-left">
+          <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">Delivery Records</h1>
+          <p class="text-sm text-gray-500 mt-1">Manage and track Delivery Records</p>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <SearchInput v-model="searchQuery" placeholder="Search" class="w-full sm:w-64" />
+          <AddButton label="New Delivery" @click="goToAddDelivery" />
+        </div>
       </div>
 
-
       <!-- Loading / Error -->
- <!-- Loading / Error -->
-<div v-if="loading" class="flex flex-col items-center justify-center h-64">
-  <Loading :loading="loading" color="#0ea5e9" size="18px" margin="3px" />
-  <span class="mt-4 text-gray-500 font-medium text-lg">Loading...</span>
-</div>
-<div v-else-if="error" class="text-center text-red-500 py-6">{{ error }}</div>
-
-
+      <div v-if="loading" class="flex flex-col items-center justify-center h-64">
+        <Loading :loading="loading" color="#0ea5e9" size="18px" margin="3px" />
+        <span class="mt-4 text-gray-500 font-medium text-lg">Loading...</span>
+      </div>
+      <div v-else-if="error" class="text-center text-red-500 py-6">{{ error }}</div>
 
       <!-- Table -->
       <div v-else class="overflow-x-auto rounded-lg shadow border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Action</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Delivery ID</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Purchase Order</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">IAR Number</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Purchase Date</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Supplier</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Amount</th>
-              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">Code Number</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Date Created</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Prepared By</th>
-              <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600">Status</th>
-            </tr>
-          </thead>
+        <BaseTable :items="paginatedDeliveries" :columns="columns" striped>
+          <!-- Actions -->
+          <template #actions="{ row }">
+            <div class="flex justify-center gap-2">
+              <EditButton @click="handleEdit(row.delivery_id)" tooltip="Edit" size="sm" />
+              <DeleteButton @delete="deleteDelivery(row.delivery_id)" tooltip="Delete" size="sm" />
+              <ApproveButton @click.stop="approveDelivery(row.delivery_id)" :disabled="row.status === 'Approved'"
+                tooltip="Approve" size="sm" />
+            </div>
+          </template>
 
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="delivery in deliveries" :key="delivery.delivery_id" class="hover:bg-blue-50 transition">
-              <td class="px-4 py-3 text-center flex justify-center gap-2">
-                <!-- Existing Action Buttons -->
-                <ActionButtons @edit="handleEdit(delivery.delivery_id)"
-                  @delete="deleteDelivery(delivery.delivery_id)" />
+          <!-- Supplier -->
+          <template #supplier="{ row }">
+            {{ row.supplier_info?.Supplier_Name || 'N/A' }}
+          </template>
 
-                <!-- ✅ New Approve Button -->
-                <button @click="approveDelivery(delivery.delivery_id)" :disabled="delivery.status === 'Approved'" class="p-2 rounded-full border flex items-center justify-center transition
-           hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
-           border-blue-700 text-blue-500 hover:bg-blue-100">
-                  <Check class="w-4 h-4" />
-                </button>
-              </td>
+          <!-- Prepared By -->
+          <template #prepared_by="{ row }">
+          </template>
 
+          <!-- Date Created -->
+          <template #created_at="{ row }">
+            {{ formatDate(row.created_at) }}
+          </template>
 
-              <td class="px-4 py-3 text-sm text-gray-700">{{ delivery.delivery_id }}</td>
-              <td class="px-4 py-3 text-sm font-medium text-gray-800">
-                {{ delivery.purchase_order_number }}
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ delivery.iar_number }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ delivery.purchase_date }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">
-                {{ delivery.supplier_info?.Supplier_Name || 'N/A' }}
-              </td>
+          <!-- Status -->
+          <template #status="{ row }">
+            <span
+              class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium shadow-sm transition-all border"
+              :class="row.status === 'Approved'
+                ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200'
+                : 'bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-200'
+                ">
+              <span class="w-2 h-2 rounded-full mr-2"
+                :class="row.status === 'Approved' ? 'bg-green-500' : 'bg-yellow-500'"></span>
+              {{ row.status }}
+            </span>
+          </template>
 
-              <td class="px-4 py-3 text-sm text-gray-500">{{ delivery.po_amount }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ delivery.code_number }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">
-                {{ formatDate(delivery.created_at) }}
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-500">
-                {{ delivery.prepared_by_employee?.full_name || 'N/A' }}
-              </td>
-              <td class="px-4 py-3 text-sm font-semibold">
-                <span class="px-2 py-1 rounded text-xs" :class="delivery.status === 'Approved'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-yellow-100 text-yellow-700'">
-                  {{ delivery.status }}
-                </span>
-              </td>
-            </tr>
+          <!-- Footer -->
+          <template #footer>
+            <div class="relative bg-gray-50 border-t border-gray-200 rounded-b-lg">
+              <div class="absolute left-4 mt-3 -translate-y-1/2 text-gray-700 text-sm md:text-small">
+                Showing items <strong>{{ startItem }}</strong> to <strong>{{ endItem }}</strong> of
+                <strong>{{ total }}</strong> entries
+              </div>
 
-            <!-- Empty state -->
-            <tr v-if="!deliveries.length">
-              <td colspan="11" class="p-6 text-center text-gray-400 italic">
-                No deliveries found.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Footer -->
-        <div
-          class="bg-gray-50 px-4 py-2 text-gray-700 text-sm rounded-b-lg border-t border-gray-200 flex justify-between items-center">
-          <span>
-            Showing <strong>{{ deliveries.length }}</strong> entries
-          </span>
-
-          <!-- Static Pagination -->
-          <div class="flex items-center gap-2">
-            <button class="px-3 py-1 border rounded hover:bg-gray-100">&laquo;</button>
-            <button class="px-3 py-1 border rounded bg-blue-500 text-white">1</button>
-            <button class="px-3 py-1 border rounded hover:bg-gray-100">&raquo;</button>
-          </div>
-        </div>
+              <div class="flex justify-center">
+                <Pagination :total="total" v-model:perPage="perPage" v-model:currentPage="currentPage"
+                  :perPageOptions="[10, 20, 30, 50, 100]" />
+              </div>
+            </div>
+          </template>
+        </BaseTable>
       </div>
     </div>
   </AppLayout>
