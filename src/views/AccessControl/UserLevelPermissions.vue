@@ -16,55 +16,60 @@
       </div>
 
       <!-- Permissions Table -->
-      <div class="bg-white rounded-lg shadow overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-600">
-          <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
-            <tr>
-              <th class="px-6 py-3 border-b">ID</th>
-              <th class="px-6 py-3 border-b text-center">Module</th>
-              <th class="px-6 py-3 border-b text-center">Table Name</th>
-              <th class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="selectAll.add" @change="toggleAll('add')" /> Add
-              </th>
-              <th class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="selectAll.edit" @change="toggleAll('edit')" /> Edit
-              </th>
-              <th class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="selectAll.view" @change="toggleAll('view')" /> View
-              </th>
-              <th class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="selectAll.delete" @change="toggleAll('delete')" /> Delete
-              </th>
-              <th class="px-6 py-3 border-b text-center">All</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="module in modules" :key="module.id" class="hover:bg-gray-50">
-              <td class="px-6 py-3 border-b font-medium text-gray-800">
-                {{ permissions[module.id]?.id ?? '-' }}
-              </td>
-              <td class="px-6 py-3 border-b font-medium text-gray-800">{{ module.module_name }}</td>
-              <td class="px-6 py-3 border-b font-medium text-gray-800 text-center">{{ module.table_name }}</td>
-              
-              <td class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="permissions[module.id].add" @change="updateModuleAll(module.id)" />
-              </td>
-              <td class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="permissions[module.id].edit" @change="updateModuleAll(module.id)" />
-              </td>
-              <td class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="permissions[module.id].view" @change="updateModuleAll(module.id)" />
-              </td>
-              <td class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="permissions[module.id].delete" @change="updateModuleAll(module.id)" />
-              </td>
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-600">
+            <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
+              <tr>
+                <th class="px-6 py-3 border-b">ID</th>
+                <th class="px-6 py-3 border-b text-center">Module</th>
+                <th class="px-6 py-3 border-b text-center">Table Name</th>
+                
+                <!-- Column Select All -->
+                <th class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="selectAll.add" @change="toggleAll('add')" /> Add
+                </th>
+                <th class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="selectAll.edit" @change="toggleAll('edit')" /> Edit
+                </th>
+                <th class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="selectAll.view" @change="toggleAll('view')" /> View
+                </th>
+                <th class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="selectAll.delete" @change="toggleAll('delete')" /> Delete
+                </th>
+                <th class="px-6 py-3 border-b text-center">All</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="module in modules" :key="module.id" class="hover:bg-gray-50">
+                <td class="px-6 py-3 border-b font-medium text-gray-800">
+                  {{ permissions[module.id].id ?? '-' }}
+                </td>
+                <td class="px-6 py-3 border-b font-medium text-gray-800">{{ module.module_name }}</td>
+                <td class="px-6 py-3 border-b font-medium text-gray-800 text-center">{{ module.table_name }}</td>
+                
+                <td class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="permissions[module.id].add" @change="updateModuleAll(module.id)" />
+                </td>
+                <td class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="permissions[module.id].edit" @change="updateModuleAll(module.id)" />
+                </td>
+                <td class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="permissions[module.id].view" @change="updateModuleAll(module.id)" />
+                </td>
+                <td class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="permissions[module.id].delete" @change="updateModuleAll(module.id)" />
+                </td>
 
-              <td class="px-6 py-3 border-b text-center">
-                <input type="checkbox" v-model="permissions[module.id].all" @change="toggleModule(module.id)" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <!-- Row toggle all -->
+                <td class="px-6 py-3 border-b text-center">
+                  <input type="checkbox" v-model="permissions[module.id].all" @change="toggleModule(module.id)" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </AppLayout>
@@ -76,8 +81,9 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import AppLayout from '@/components/layouts/AppLayout.vue'
 
-// Axios baseURL
-axios.defaults.baseURL = 'http://localhost:8000/api'
+// Make sure baseURL is set once in your project, e.g. in main.ts
+// axios.defaults.baseURL = 'http://localhost:8000/api';
+// axios.defaults.withCredentials = true; // if using Sanctum
 
 const breadcrumbs = [
   { title: 'Access Control', href: '/access-control' },
@@ -93,25 +99,27 @@ const modules = ref<any[]>([])
 const permissions = ref<{ [key: string]: any }>({})
 const selectAll = ref({ add: false, edit: false, view: false, delete: false })
 
-onMounted(async () => {
+const fetchModulesAndPermissions = async () => {
   try {
-    // Fetch user level info
-    const resLevel = await axios.get(`/user-levels/${levelId}`)
+    // Fetch user level
+    const resLevel = await axios.get(`user-levels/${levelId}`)
     level.value = resLevel.data
 
-    // Fetch all modules
-    const resModules = await axios.get('/modules')
+    // Fetch modules
+    const resModules = await axios.get('modules')
     modules.value = resModules.data
 
-    // Initialize permissions
+    // Initialize permissions object
     permissions.value = {}
-    modules.value.forEach(m => {
-      permissions.value[m.id] = { add: false, edit: false, view: false, delete: false, all: false, id: null }
+    modules.value.forEach((m: any) => {
+      permissions.value[m.id] = { add: false, edit: false, view: false, delete: false, all: false }
     })
 
-    // Fetch existing permissions
-    const resPerms = await axios.get(`/user-levels/${levelId}/permissions`)
-    resPerms.data.forEach((p: any) => {
+    // Fetch existing permissions for this user level
+    const resPerms = await axios.get(`user-levels/${levelId}/permissions`)
+    const permsArray = Array.isArray(resPerms.data) ? resPerms.data : Object.values(resPerms.data)
+
+    permsArray.forEach((p: any) => {
       if (permissions.value[p.module_id]) {
         permissions.value[p.module_id] = {
           id: p.id,
@@ -123,12 +131,17 @@ onMounted(async () => {
         }
       }
     })
-  } catch (err) {
-    console.error('Fetch data error:', err)
-    alert('Failed to load permissions.')
+  } catch (err: any) {
+    console.error('Fetch data error:', err.response || err)
+    alert('Failed to fetch data. Make sure you are logged in.')
   }
+}
+
+onMounted(() => {
+  fetchModulesAndPermissions()
 })
 
+// Toggle all permissions in a column
 const toggleAll = (type: 'add' | 'edit' | 'view' | 'delete') => {
   modules.value.forEach(m => {
     permissions.value[m.id][type] = selectAll.value[type]
@@ -136,6 +149,7 @@ const toggleAll = (type: 'add' | 'edit' | 'view' | 'delete') => {
   })
 }
 
+// Toggle all permissions for a module
 const toggleModule = (moduleId: number) => {
   const all = permissions.value[moduleId].all
   permissions.value[moduleId].add = all
@@ -144,23 +158,25 @@ const toggleModule = (moduleId: number) => {
   permissions.value[moduleId].delete = all
 }
 
+// Update "all" checkbox when individual permissions change
 const updateModuleAll = (moduleId: number) => {
   const perms = permissions.value[moduleId]
   perms.all = perms.add && perms.edit && perms.view && perms.delete
 }
 
+// Save permissions
 const savePermissions = async () => {
   try {
     const payload = Object.entries(permissions.value).map(([moduleId, perm]) => ({
       module_id: Number(moduleId),
-      id: perm.id,
       can_add: perm.add ? 1 : 0,
       can_edit: perm.edit ? 1 : 0,
       can_view: perm.view ? 1 : 0,
-      can_delete: perm.delete ? 1 : 0
+      can_delete: perm.delete ? 1 : 0,
+      id: perm.id ?? null
     }))
 
-    await axios.put(`/user-levels/${levelId}/permissions`, { permissions: payload })
+    await axios.put(`user-levels/${levelId}/permissions`, { permissions: payload })
     alert('Permissions saved successfully!')
   } catch (err: any) {
     console.error('Save permissions error:', err.response || err)
