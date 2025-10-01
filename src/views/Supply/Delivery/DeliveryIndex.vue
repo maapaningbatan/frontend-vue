@@ -206,7 +206,7 @@ async function approveDelivery(id: number) {
 
           <!-- Supplier -->
           <template #supplier="{ row }">
-            {{ row.supplier_info?.Supplier_Name || 'N/A' }}
+            {{ row.supplier_info?.supplier_name || 'N/A' }}
           </template>
 
           <!-- Prepared By -->

@@ -65,8 +65,8 @@ onMounted(fetchUser)
           <!-- Tab 1: User Credentials -->
           <template v-if="currentTab === 0">
             <h3 class="text-lg font-semibold text-cyan-700 mb-2">User Credentials</h3>
-            <p><span class="font-medium">Username:</span> {{ user.Username }}</p>
-            <p><span class="font-medium">Email:</span> {{ user.Email_Address }}</p>
+            <p><span class="font-medium">Username:</span> {{ user.username }}</p>
+            <p><span class="font-medium">Email:</span> {{ user.email }}</p>
           </template>
 
           <!-- Tab 2: Personal Information -->

@@ -143,7 +143,7 @@
         <!-- Register prompt -->
         <p class="text-center mt-6">
           Don’t have an account?
-          <router-link to="/auth/register" class="text-cyan-600 font-semibold hover:underline"
+          <router-link to="/register" class="text-cyan-600 font-semibold hover:underline"
             >Go to Register</router-link
           >
         </p>

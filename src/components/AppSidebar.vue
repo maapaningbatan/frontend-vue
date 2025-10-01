@@ -2,7 +2,8 @@
 import NavFooter from '@/components/NavFooter.vue'
 import NavMain from '@/components/NavMain.vue'
 import NavUser from '@/components/NavUser.vue'
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenuButton } from '@/components/ui/sidebar'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
+
 import type { NavItem } from '@/types/api'
 import { BookOpen, Building2, Folder, LayoutGrid, PackageOpen, MonitorSmartphone, Boxes, NotebookPen, Warehouse, Headset, FileX } from 'lucide-vue-next'
 import AppLogo from './AppLogo.vue'

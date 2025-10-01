@@ -27,20 +27,14 @@ const routes = [
   // Default → redirect to /login
   { path: '/', redirect: '/login' },
 
-  // Auth wrapper (nested)
   {
-    path: '/auth',
+    path: '/',
     component: Auth,
     children: [
-      { path: '', redirect: '/auth/login' },
-      { path: 'login', name: 'AuthLogin', component: Login },
-      { path: 'register', name: 'AuthRegister', component: Register },
+      { path: 'login', name: 'Login', component: Login }, // → /login
+      { path: 'register', name: 'Register', component: Register }, // → /register
     ],
   },
-
-  // Top-level login/register but still using Auth.vue
-  { path: '/login', component: Auth, children: [{ path: '', component: Login }] },
-  { path: '/register', component: Auth, children: [{ path: '', component: Register }] },
 
   // Dashboard route
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
@@ -77,7 +71,7 @@ const routes = [
     name: 'PropertyIssuanceEdit',
     props: true,
   },
-  {path: '/ics-record', component: ICSRecord, name: 'ICSRecord'},
+  { path: '/ics-record', component: ICSRecord, name: 'ICSRecord' },
   { path: '/ris', component: RISIndex, name: 'RISIndex' },
   { path: '/ris/add', component: RISAdd, name: 'RISAdd' },
 
@@ -92,12 +86,12 @@ const routes = [
       requiresAuth: true, // optional if you have auth middleware
     },
   },
-{
-  path: '/access-control/user-levels/:id/permissions',
-  name: 'UserLevelPermissions',
-  component: () => import('@/views/AccessControl/UserLevelPermissions.vue'),
-  props: true
-},
+  {
+    path: '/access-control/user-levels/:id/permissions',
+    name: 'UserLevelPermissions',
+    component: () => import('@/views/AccessControl/UserLevelPermissions.vue'),
+    props: true,
+  },
 ]
 
 const router = createRouter({
